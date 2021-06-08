@@ -1,4 +1,6 @@
 @import "./normalize.css";
+@import "./iconfont.css";
+/* @import "./loginPage.css"; */
 
 :root {
   --theme-light-green: #D8E6E7;
@@ -20,7 +22,8 @@ body {
   color: var(--font-color);
 }
 
-main {
+main,
+.w {
   width: 1000px;
   margin: auto;
 }

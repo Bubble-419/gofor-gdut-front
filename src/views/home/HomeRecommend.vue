@@ -1,5 +1,6 @@
 <template>
   <div class="recommend">
+    <p>test</p>
     <order-list :orderList="recommendOrderList"></order-list>
   </div>
 </template>

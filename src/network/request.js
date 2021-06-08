@@ -7,7 +7,11 @@ export function request(config) {
   });
 
   instance.interceptors.request.use(config => {
-    // TO-DO
+    // 请求拦截判断登陆权限
+    const token = window.localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = 'Bearer ' + token;
+    }
     return config;
   }, err => {
     // TO-DO
@@ -18,7 +22,16 @@ export function request(config) {
     // TO-DO
     return res;
   }, err => {
-    // TO-DO
+    // 响应拦截，判断401权限错误，转到登录页
+    if (err.response.status == '401') {
+      this.$notify({
+        title: '请先登录',
+        type: 'warning',
+      });
+      this.$router.push({
+        name: 'LoginPage'
+      });
+    }
     console.log(err);
   });
 

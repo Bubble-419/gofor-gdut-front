@@ -10,21 +10,61 @@
         @keyup.enter="search"
       />
     </div>
-    <button class="login">登录/注册</button>
+    <div v-if="isLogin" key="loginHeader" class="loginHeader">
+      <router-link to="/manager" tag="span" class="manager">管理员入口</router-link>
+      <div class="user-center">
+        <el-button type="primary">我要发布</el-button>
+        <el-menu
+          menu-trigger="hover"
+          mode="horizontal"
+          active-text-color="var(--theme-medium-green)"
+        >
+          <el-submenu index="1">
+            <template #title>
+              <el-avatar
+                size="medium"
+                :src="userIcon"
+              ></el-avatar>
+            </template>
+            <el-menu-item index="1-1" route="{path:'/center/userinfo'}"
+              >个人中心</el-menu-item
+            >
+            <el-menu-item index="1-2" route="{path:'center/myorder'}"
+              >我的订单</el-menu-item
+            >
+            <el-menu-item index="1-3" route="{path:'center/history'}"
+              >历史浏览</el-menu-item
+            >
+          </el-submenu>
+        </el-menu>
+      </div>
+    </div>
+
+    <el-button
+      v-else
+      key=""
+      class="login"
+      @click="$router.push({ name: 'LoginPage' })"
+      >登录/注册</el-button
+    >
   </header>
 </template>
 
 <script>
-import { ref } from "vue";
+import { computed, ref, toRefs } from "vue";
+import { useStore } from "vuex";
 import { searchByKeywords } from "network/header.js";
 export default {
   name: "MyHeader",
   setup() {
+    const store = useStore();
+    const user = computed(() => store.state.user);
     const keywords = ref("");
     const search = () => {
       searchByKeywords(keywords);
     };
     return {
+      ...toRefs(user),
       keywords,
       search,
     };
@@ -86,8 +126,32 @@ header {
 }
 
 .search input:focus {
-  width: 200px;
+  width: 250px;
   padding: 18px;
   cursor: default;
+}
+
+.login-header,
+.user-center {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.login-header {
+  width: 400px;
+}
+
+.user-center {
+  width: 250px;
+}
+
+.manager {
+  font-size: .9em;
+}
+
+.manager:hover {
+  color: var(--theme-medium-green);
+  text-decoration: underline;
 }
 </style>

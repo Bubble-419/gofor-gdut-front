@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div id="home">
     <my-header></my-header>
     <div class="banner">
       <div class="box" v-for="img in bannerImg" :key="img.name">
@@ -14,13 +14,15 @@
         </svg>
         万事皆可跑腿
       </a>
-      <home-recommend id="rec"></home-recommend>
     </main>
+    <home-recommend id="rec"></home-recommend>
+    <my-footer></my-footer>
   </div>
 </template>
 
 <script>
 import MyHeader from "components/content/MyHeader";
+import MyFooter from "components/content/MyFooter";
 import HomeRecommend from "./HomeRecommend";
 
 export default {
@@ -50,6 +52,7 @@ export default {
   components: {
     MyHeader,
     HomeRecommend,
+    MyFooter,
   },
 };
 </script>
@@ -117,7 +120,7 @@ export default {
   font-weight: 700;
   text-align: center;
   font-size: 26px;
-  transition: .5s;
+  transition: 0.5s;
 }
 
 .slogan svg {
