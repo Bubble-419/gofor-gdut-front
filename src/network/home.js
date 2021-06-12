@@ -4,6 +4,6 @@ import {
 
 export function getHomeRecommendList() {
   return request({
-    url: '',
+    url: '/orders/randomOrders',
   })
 }

@@ -8,6 +8,7 @@ import getters from './getters'
 const state = {
   user: {
     isLogin: window.localStorage.getItem('token') ? true : false,
+    userId:'',
     roleId: 0,
     userIcon:'',
   }

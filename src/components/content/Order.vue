@@ -1,17 +1,22 @@
 <template>
-  <el-card class="order-box">
-    <el-space :size="20" class="user-info">
-      <el-avatar size="large" :src="userIcon"></el-avatar>
-      <span>{{ username }}</span>
+  <el-card
+    id="order-box"
+    @click="
+      this.$router.push({ name: 'Detail', params: { orderId: order.orderId } })
+    "
+  >
+    <el-space :size="20" class="publisher-info">
+      <el-avatar size="large" :src="publisher.publisherIcon"></el-avatar>
+      <span>{{ publisher.publishername }}</span>
     </el-space>
     <el-card shadow="never" class="order">
       <template #header>
         <div class="order-header">
           <div>
             <el-tag>已接单</el-tag>
-            <span>代拿快递</span>
+            <span class="order-category">代拿快递</span>
           </div>
-          <h3 class="price">{{ order.price }}</h3>
+          <h3 class="price">￥{{ order.price }}</h3>
         </div>
       </template>
       <div class="order-body">
@@ -26,39 +31,65 @@
 </template>
 
 <script>
+import { getUserInfoById } from "network/user.js";
+import { reactive, toRefs, onMounted } from "vue";
 export default {
   name: "Order",
   props: {
-    userName: {
-      type: String,
-      default: "胖可丁",
-    },
-    userIcon: {
-      type: String,
-      default:
-        "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+    // publisherName: {
+    //   type: String,
+    //   default: "胖可丁",
+    //   required
+    // },
+    // publisherIcon: {
+    //   type: String,
+    //   default:
+    //     "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
+    // },
+    publisherId: {
+      type: Number,
+      default: 0,
+      // required: true,
     },
     order: {
       type: Object,
       default: function () {
         return {};
       },
+      // required: true,
     },
+  },
+  setup(props) {
+    const state = reactive({
+      publisher: {
+        publisherName: "",
+        publisherIcon: "",
+      },
+    });
+    onMounted(() => {
+      getUserInfoById(props.order.publisherId).then((res) => {
+        state.publisher.publisherName = res.object.userName;
+        state.publisher.publisherIcon = res.object.userIcon;
+      });
+    });
+    return {
+      ...toRefs(state),
+    };
   },
 };
 </script>
 
 <style scoped>
-.order-box {
+#order-box {
   padding: 5px 20px;
+  cursor: pointer;
 }
 
-.user-info {
+.publisher-info {
   margin: 5px 10px;
 }
 
 .order {
-  background-color: var(--bg-color);
   padding: 0 25px;
 }
 
@@ -71,5 +102,10 @@ export default {
 .price {
   font-size: 1.5em;
   color: var(--price-color);
+}
+
+.order-category {
+  margin-left: 18px;
+  color: var(--font-title-color);
 }
 </style>

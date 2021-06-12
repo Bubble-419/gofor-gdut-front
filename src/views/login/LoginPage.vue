@@ -63,8 +63,8 @@ main {
 
 .box {
   position: relative;
-  width: 520px;
-  height: 500px;
+  width: 560px;
+  height: 550px;
   border-radius: 6px;
   transform-style: preserve-3d;
   transition: 0.8s;

@@ -4,37 +4,32 @@
     <div class="search">
       <input
         type="search"
-        placeholder="Search..."
+        placeholder="请按地址搜索..."
         class="search"
         v-model="keywords"
         @keyup.enter="search"
       />
     </div>
-    <div v-if="isLogin" key="loginHeader" class="loginHeader">
-      <router-link to="/manager" tag="span" class="manager">管理员入口</router-link>
+    <div v-if="!isLogin" key="loginHeader" class="login-header">
+      <router-link to="/manager" tag="span" class="manager" v-if="roleId < 3"
+        >管理员入口</router-link
+      >
       <div class="user-center">
         <el-button type="primary">我要发布</el-button>
         <el-menu
           menu-trigger="hover"
           mode="horizontal"
           active-text-color="var(--theme-medium-green)"
+          :router="true"
         >
           <el-submenu index="1">
             <template #title>
-              <el-avatar
-                size="medium"
-                :src="userIcon"
-              ></el-avatar>
+              <el-avatar size="medium" :src="userIcon"></el-avatar>
             </template>
-            <el-menu-item index="1-1" route="{path:'/center/userinfo'}"
-              >个人中心</el-menu-item
-            >
-            <el-menu-item index="1-2" route="{path:'center/myorder'}"
-              >我的订单</el-menu-item
-            >
-            <el-menu-item index="1-3" route="{path:'center/history'}"
-              >历史浏览</el-menu-item
-            >
+            <el-menu-item index="/userinfo">个人中心</el-menu-item>
+            <el-menu-item index="/my-published">我的订单</el-menu-item>
+            <el-menu-item index="/history">历史浏览</el-menu-item>
+            <el-menu-item index="/" @click="toLogout">退出账号</el-menu-item>
           </el-submenu>
         </el-menu>
       </div>
@@ -54,19 +49,39 @@
 import { computed, ref, toRefs } from "vue";
 import { useStore } from "vuex";
 import { searchByKeywords } from "network/header.js";
+import { logout } from "network/user.js";
+import { ElMessageBox } from "element-plus";
+import { useRouter } from "vue-router";
 export default {
   name: "MyHeader",
   setup() {
     const store = useStore();
+    const router = useRouter();
     const user = computed(() => store.state.user);
     const keywords = ref("");
     const search = () => {
       searchByKeywords(keywords);
     };
+    const toLogout = () => {
+      ElMessageBox.confirm("确定要退出当前账号吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      }).then(() => {
+        logout().then((res) => {
+          if (res.status == 200) {
+            // 清除token
+            window.localStorage.setItem("token", "");
+            router.go(0);
+          }
+        });
+      });
+    };
     return {
       ...toRefs(user),
       keywords,
       search,
+      toLogout,
     };
   },
 };
@@ -75,7 +90,7 @@ export default {
 <style scoped>
 header {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
   position: sticky;
   left: 0;
@@ -139,7 +154,8 @@ header {
 }
 
 .login-header {
-  width: 400px;
+  width: 340px;
+  margin-left: 100px;
 }
 
 .user-center {
@@ -147,7 +163,7 @@ header {
 }
 
 .manager {
-  font-size: .9em;
+  font-size: 0.9em;
 }
 
 .manager:hover {

@@ -15,7 +15,7 @@
         万事皆可跑腿
       </a>
     </main>
-    <home-recommend id="rec"></home-recommend>
+    <home-recommend></home-recommend>
     <my-footer></my-footer>
   </div>
 </template>
@@ -27,32 +27,33 @@ import HomeRecommend from "./HomeRecommend";
 
 export default {
   name: "Home",
-  data() {
-    return {
-      bannerImg: [
-        {
-          name: "拿外卖",
-          src: require("assets/images/banner (1).svg"),
-        },
-        {
-          name: "取快递",
-          src: require("assets/images/banner (2).svg"),
-        },
-        {
-          name: "代跑腿",
-          src: require("assets/images/banner (3).svg"),
-        },
-        {
-          name: "其他",
-          src: require("assets/images/banner (4).svg"),
-        },
-      ],
-    };
-  },
   components: {
     MyHeader,
     HomeRecommend,
     MyFooter,
+  },
+  setup() {
+    const bannerImg = [
+      {
+        name: "取快递",
+        src: require("assets/images/banner (3).svg"),
+      },
+      {
+        name: "代取物",
+        src: require("assets/images/banner (2).svg"),
+      },
+      {
+        name: "拿外卖",
+        src: require("assets/images/banner (1).svg"),
+      },
+      {
+        name: "帮打印",
+        src: require("assets/images/banner (4).svg"),
+      },
+    ];
+    return {
+      bannerImg,
+    };
   },
 };
 </script>

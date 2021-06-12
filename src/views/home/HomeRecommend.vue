@@ -1,14 +1,16 @@
 <template>
-  <div class="recommend">
-    <p>test</p>
+  <main id="recommend">
     <order-list :orderList="recommendOrderList"></order-list>
-  </div>
+    <div class="refresh" @click="getList">
+      <i class="el-icon-refresh" v-show="isRefresh">&nbsp;&nbsp;换一组</i>
+    </div>
+  </main>
 </template>
 
 <script>
 import OrderList from "components/content/OrderList";
 import { getHomeRecommendList } from "network/home.js";
-import { ref, onMounted } from "vue";
+import { computed, onMounted, reactive, toRefs } from "vue";
 
 export default {
   name: "HomeRecommend",
@@ -16,23 +18,39 @@ export default {
     OrderList,
   },
   setup() {
-    const recommendOrderList = ref([]);
-
-    onMounted(() => {
+    const state = reactive({
+      recommendOrderList: [],
+      isRefresh: computed(() => {
+        return state.recommendOrderList.length != 0;
+      }),
+    });
+    const getList = () => {
       getHomeRecommendList().then((res) => {
-        recommendOrderList.value = res.orderList.data;
+        state.recommendOrderList = res.object;
       });
+    };
+    onMounted(() => {
+      getList();
     });
 
     return {
-      recommendOrderList,
+      ...toRefs(state),
+      getList,
     };
   },
 };
 </script>
 
 <style scoped>
-.recommend {
-  margin-top: 120px;
+#recommend {
+  padding: 150px 0;
+}
+
+.refresh {
+  margin-top: 80px;
+  text-align: center;
+  color: var(--theme-dark-green);
+  font-weight: 900;
+  font-size: 1.1em;
 }
 </style>

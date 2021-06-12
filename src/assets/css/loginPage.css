@@ -44,3 +44,20 @@ h2 {
 a {
   font-size: .9em;
 }
+
+.input-captcha {
+  position: relative;
+  height: 40px;
+}
+
+.input-captcha input {
+  width: 120px;
+  left: 0;
+  top: 0;
+}
+
+.input-captcha .captcha {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
