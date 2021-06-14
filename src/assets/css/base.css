@@ -40,3 +40,17 @@ button,
 input:focus {
   outline: 0;
 }
+
+.el-descriptions :not(.is-bordered) td {
+  padding-bottom: 20px;
+  font-size: 1.1em;
+}
+
+.el-descriptions__label {
+  padding-right: 35px;
+}
+
+.el-descriptions__content {
+  font-weight: 700;
+
+}

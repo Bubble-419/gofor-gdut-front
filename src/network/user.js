@@ -52,3 +52,20 @@ export function getCaptcha() {
     url: '/captcha?time=' + new Date(),
   })
 }
+
+export function updatePwd(data) {
+  return request({
+    url: '/users/userpwd',
+    method: 'put',
+    data
+  })
+}
+
+// 用户进行投诉反馈
+export function complain(data) {
+  return request({
+    url: '/complains/complain',
+    method: 'post',
+    data
+  })
+}

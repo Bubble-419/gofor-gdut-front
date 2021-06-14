@@ -7,24 +7,27 @@
   >
     <el-space :size="20" class="publisher-info">
       <el-avatar size="large" :src="publisher.publisherIcon"></el-avatar>
-      <span>{{ publisher.publishername }}</span>
+      <span>{{ publisher.publisherName }}</span>
+      <span
+        class="phone"
+        v-show="store.state.user.userId == order.receiverId"
+        >{{ publisher.publisherContact }}</span
+      >
     </el-space>
     <el-card shadow="never" class="order">
       <template #header>
         <div class="order-header">
           <div>
-            <el-tag>已接单</el-tag>
-            <span class="order-category">代拿快递</span>
+            <el-tag>{{ orderStatusName }}</el-tag>
+            <span class="order-category">{{ orderCategoryName }}</span>
           </div>
           <h3 class="price">￥{{ order.price }}</h3>
         </div>
       </template>
       <div class="order-body">
-        <el-space direction="vertical" :size="15">
-          <div>取件地址：{{ order.takeAddress }}</div>
-          <div>收件地址：{{ order.sendAddress }}</div>
-          <div>{{ order.orderNote }}</div>
-        </el-space>
+        <div>取件地址：{{ order.takeAddress }}</div>
+        <div>收件地址：{{ order.sendAddress }}</div>
+        <div>订单备注：{{ order.orderNote }}</div>
       </div>
     </el-card>
   </el-card>
@@ -33,24 +36,10 @@
 <script>
 import { getUserInfoById } from "network/user.js";
 import { reactive, toRefs, onMounted } from "vue";
+import { useStore } from "vuex";
 export default {
   name: "Order",
   props: {
-    // publisherName: {
-    //   type: String,
-    //   default: "胖可丁",
-    //   required
-    // },
-    // publisherIcon: {
-    //   type: String,
-    //   default:
-    //     "https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png",
-    // },
-    publisherId: {
-      type: Number,
-      default: 0,
-      // required: true,
-    },
     order: {
       type: Object,
       default: function () {
@@ -60,20 +49,28 @@ export default {
     },
   },
   setup(props) {
+    const store = useStore();
     const state = reactive({
       publisher: {
         publisherName: "",
         publisherIcon: "",
+        publisherContact: 0,
       },
+      orderCategoryName: store.getters.getOrderCategory(
+        props.order.orderCategoryId
+      ),
+      orderStatusName: store.getters.getOrderStatus(props.order.orderStatus),
     });
     onMounted(() => {
-      getUserInfoById(props.order.publisherId).then((res) => {
+      getUserInfoById({ userId: props.order.publisherId }).then((res) => {
         state.publisher.publisherName = res.object.userName;
         state.publisher.publisherIcon = res.object.userIcon;
+        state.publisher.publisherContact = res.object.userContact;
       });
     });
     return {
       ...toRefs(state),
+      store,
     };
   },
 };
@@ -86,6 +83,7 @@ export default {
 }
 
 .publisher-info {
+  position: relative;
   margin: 5px 10px;
 }
 
@@ -107,5 +105,28 @@ export default {
 .order-category {
   margin-left: 18px;
   color: var(--font-title-color);
+}
+
+.order-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 90px;
+  padding: 0 30px;
+}
+
+.phone {
+  font-size: 1.1em;
+  font-weight: 700;
+  margin-left: 40px;
+}
+.phone::after {
+  position: absolute;
+  right: 20px;
+  bottom: 0;
+  content: "仅对接单人可见";
+  font-size: 0.7em;
+  color: var(--theme-dark-green);
+  font-weight: 400;
 }
 </style>

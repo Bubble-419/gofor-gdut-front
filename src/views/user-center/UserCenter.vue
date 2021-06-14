@@ -12,6 +12,8 @@
             <el-submenu index="1">
               <template #title> 个人中心 </template>
               <el-menu-item index="/userinfo">修改信息</el-menu-item>
+              <el-menu-item index="/security">账号安全</el-menu-item>
+              <el-menu-item index="/complain">投诉反馈</el-menu-item>
             </el-submenu>
             <el-submenu index="2">
               <template #title> 我的订单 </template>
@@ -59,7 +61,7 @@ export default {
 
 <style scoped>
 main {
-  height: 600px;
+  height: 680px;
   background-color: #fff;
   padding: 30px 60px;
 }

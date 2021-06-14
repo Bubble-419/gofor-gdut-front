@@ -44,31 +44,20 @@
 
 <script>
 import { getUserInfo, updateUserInfo } from "network/user.js";
-import { onMounted, reactive, toRefs, ref, watch } from "vue";
+import { onMounted, reactive, toRefs, watch } from "vue";
 import { onBeforeRouteLeave } from "vue-router";
 import { ElMessageBox } from "element-plus";
+import { useStore } from "vuex";
 
 export default {
   name: "UserInfo",
   setup() {
+    const store = useStore();
     const state = reactive({
       user: {},
       isDisabled: true,
+      positions: store.state.positions,
     });
-    const positions = ref([
-      {
-        label: "大学城校区",
-        value: "大学城校区",
-      },
-      {
-        label: "龙洞校区",
-        value: "龙洞校区",
-      },
-      {
-        label: "东风路校区",
-        value: "东风路校区",
-      },
-    ]);
     const handleAvatarSuccess = (res, file) => {
       state.user.userIcon = URL.createObjectURL(file.raw);
     };
@@ -104,7 +93,7 @@ export default {
       watch(
         () => [state.user],
         () => {
-          if (state.isDisabled) {
+          if (state.isDisabled == true) {
             state.isDisabled = false;
           }
         },
@@ -114,7 +103,6 @@ export default {
 
     return {
       ...toRefs(state),
-      positions,
       onUpdate,
       handleAvatarSuccess,
     };

@@ -1,13 +1,329 @@
 <template>
-  <div id="detail"></div>
+  <div id="detail">
+    <my-header></my-header>
+    <main>
+      <order :order="order"></order>
+      <div class="receiver">
+        <h4>接单同学</h4>
+        <el-card class="small-card">
+          <div class="receiver-info">
+            <div class="profile">
+              <el-avatar size="large" :src="receiver.userIcon"></el-avatar>
+              <span>
+                {{ receiver.name }}
+              </span>
+              <span>
+                <i class="el-icon-male" v-if="receiver.sex == 0"></i>
+                <i class="el-icon-female" v-if="receiver.sex == 1"></i>
+              </span>
+            </div>
+            <span v-show="option.id > 0">
+              联系方式：{{ receiver.userContact }} </span
+            ><span v-show="option.id > 0"
+              >信用：
+              {{ receiver.credit }}
+            </span>
+          </div>
+        </el-card>
+      </div>
+      <div class="comment" v-if="commentContent != ''">
+        <h4>评价</h4>
+        <el-card class="small-card">
+          <el-rate
+            v-model="commentContent.commentStars"
+            disabled
+            show-score
+          ></el-rate>
+          <div class="details" v-if="commentContent.commentDetails != ''">
+            {{ commentContent.commentDetails }}
+          </div>
+        </el-card>
+      </div>
+      <div class="repay" v-if="repayContent != ''">
+        <h4>回复</h4>
+        <el-card class="small-card">
+          {{ repayContent.repayDetails }}
+        </el-card>
+      </div>
+      <el-button
+        type="primary"
+        @click="option.option"
+        :disabled="!option.able"
+        >{{ option.label }}</el-button
+      >
+    </main>
+    <el-dialog v-model="commentFormVisible" title="评价">
+      <el-form
+        ref="commentInfo"
+        :model="commentForm"
+        :rules="{
+          star: [{ required: true, message: '评分不能为空', trigger: 'blur' }],
+        }"
+      >
+        <el-form-item prop="commentStars">
+          <el-rate v-model="commentForm.commentStars"></el-rate>
+        </el-form-item>
+        <el-form-item prop="commentDetails">
+          <el-input
+            type="textarea"
+            :rows="4"
+            placeholder="写下你的评价..."
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="commentFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="onSubmitCom">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="repayFormVisible" title="回复评价">
+      <el-form :model="repayForm">
+        <el-form-item>
+          <el-input
+            type="textarea"
+            :rows="4"
+            placeholder="写下你的回复..."
+          ></el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="commentFormVisible = false">取 消</el-button>
+          <el-button type="primary" @click="onSubmitRep">确 定</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
+import { useRoute } from "vue-router";
+import { getDetail } from "network/order.js";
+import { onBeforeMount, onMounted, reactive, toRefs, ref, computed } from "vue";
+import MyHeader from "components/content/MyHeader.vue";
+import Order from "components/content/Order";
+import { useStore } from "vuex";
+import {
+  receiveOrder,
+  finishOrder,
+  commentOrder,
+  commentRepalyOrder,
+  getComment,
+  getRepay,
+} from "network/order.js";
+import { getUserInfoById } from "network/user.js";
+import { useRouter } from "vue-router";
+
 export default {
   name: "Detail",
-  setup() {},
+  components: { Order, MyHeader },
+  setup() {
+    const route = useRoute();
+    const router = useRouter();
+    const store = useStore();
+    const state = reactive({
+      order: {},
+      option: {},
+      options: [
+        {
+          id: 0,
+          label: "我要接单",
+          able: true,
+          option: () => {
+            receiveOrder({ userId: store.state.user.userId });
+            router.go(0);
+          },
+        },
+        {
+          id: 1,
+          label: "我要修改",
+          able: true,
+          option: () => {
+            router.push({
+              name: "UpdateOrder",
+              params: { orderId: state.order.orderId },
+            });
+          },
+        },
+        {
+          id: 2,
+          label: "我已完成",
+          able: true,
+          option: () => {
+            finishOrder({ orderId: state.order.orderId });
+            router.go(0);
+          },
+        },
+        {
+          id: 3,
+          label: "待完成",
+          able: false,
+        },
+        {
+          id: 4,
+          label: "我要评价",
+          able: true,
+          option: () => {
+            state.commentFormVisible = true;
+          },
+        },
+        {
+          id: 5,
+          label: "我要回复",
+          able: true,
+          option: () => {
+            state.repayFormVisible = true;
+          },
+        },
+        {
+          id: 6,
+          label: "已完成",
+          able: false,
+        },
+        {
+          id: 7,
+          label: "订单无效",
+          able: false,
+        },
+      ],
+      commentForm: {
+        commentDetails: "",
+        commentStars: 0,
+      },
+      commentFormVisible: false,
+      repayForm: {
+        repayDetails: "",
+      },
+      repayFormVisible: false,
+      receiver: {},
+      commentContent: "",
+      repayContent: "",
+    });
+    const commentInfo = ref(null);
+    const onSubmitCom = () => {
+      state.commentFormVisible = false;
+      commentInfo.value.validate((valid) => {
+        if (valid) {
+          commentInfo.value = computed(() => {
+            return {
+              orderId: state.order.orderId,
+              commentStars: state.commentInfo.commentStars,
+              commentSDetails: state.commentInfo.commentSDetails,
+              commentPic: "",
+            };
+          });
+          commentOrder(commentInfo.value);
+        }
+      });
+    };
+    const onSubmitRep = () => {
+      state.repayFormVisible = false;
+      commentRepalyOrder({
+        commentId: state.commentContent.commentId,
+        replayDetails: state.repayForm.repayDetails,
+      });
+    };
+    onBeforeMount(() => {
+      getDetail({ orderId: route.params.orderId }).then((res) => {
+        state.order = res.object;
+      });
+    });
+    onMounted(() => {
+      let optionId = 0;
+      if (
+        state.order.orderStatus == 0 &&
+        store.state.user.userId != state.order.publisherId
+      ) {
+        optionId = 0;
+      }
+      if (
+        state.order.orderStatus == 0 &&
+        store.state.user.userId == state.order.publisherId
+      ) {
+        optionId = 1;
+      }
+      if (
+        state.order.orderStatus == 1 &&
+        store.state.user.userId == state.order.receiverId
+      ) {
+        optionId = 2;
+      }
+      if (
+        state.order.orderStatus == 1 &&
+        store.state.user.userId == state.order.publisherId
+      ) {
+        optionId = 3;
+      }
+      if (
+        state.order.orderStatus == 2 &&
+        (store.state.user.userId == state.order.publisherId ||
+          store.state.user.userId == state.order.receiverId)
+      ) {
+        optionId = 4;
+      }
+      if (
+        state.order.orderStatus == 3 &&
+        (store.state.user.userId == state.order.publisherId ||
+          store.state.user.userId == state.order.receiverId)
+      ) {
+        optionId = 5;
+      } else if (state.order.orderStatus >= 2 && state.order.orderStatus < 4) {
+        optionId = 6;
+      } else {
+        optionId = 7;
+      }
+      state.option = state.options.find((o) => o.id == optionId);
+      getUserInfoById({ userId: state.order.receiverId }).then((res) => {
+        state.receiver = res.object;
+      });
+      getComment({ orderId: state.order.orderId }).then((res) => {
+        state.commentContent = res.object;
+      });
+      if (state.commentContent != "") {
+        getRepay({ commentId: state.commentContent.commentId }).then((res) => {
+          state.repayContent = res.object;
+        });
+      }
+    });
+    return {
+      ...toRefs(state),
+      onSubmitCom,
+      commentInfo,
+      onSubmitRep,
+    };
+  },
 };
 </script>
 
 <style scoped>
+#detail main {
+  padding: 80px 0;
+  margin-bottom: 50px;
+}
+.receiver,
+.comment,
+.repay {
+  margin: 30px 0;
+}
+
+h4 {
+  margin-bottom: 10px;
+}
+
+.small-card {
+  height: 70px;
+}
+
+.receiver-info,
+.profile {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.profile {
+  width: 150px;
+}
 </style>

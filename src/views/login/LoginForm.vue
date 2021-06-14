@@ -67,6 +67,7 @@ export default {
               store.commit("setisLogin", true);
               store.commit("setUser", {
                 userId: res.object.userId,
+                username: res.object.username,
                 roleId: res.object.roleId,
                 userIcon: res.object.userIcon,
               });

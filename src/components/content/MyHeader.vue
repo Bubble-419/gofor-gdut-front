@@ -1,20 +1,24 @@
 <template>
   <header>
-    <div class="logo"><img src="~assets/images/logo.png" alt="" /></div>
+    <div class="logo" @click="$router.push({ name: 'Home' })">
+      <img src="~assets/images/logo.png" alt="" />
+    </div>
     <div class="search">
       <input
         type="search"
         placeholder="请按地址搜索..."
         class="search"
         v-model="keywords"
-        @keyup.enter="search"
+        @keyup.enter="
+          $router.push({ name: 'SearchResult', params: { keywords } })
+        "
       />
     </div>
-    <div v-if="!isLogin" key="loginHeader" class="login-header">
+    <div v-if="isLogin" key="loginHeader" class="login-header">
       <router-link to="/manager" tag="span" class="manager" v-if="roleId < 3"
         >管理员入口</router-link
       >
-      <div class="user-center">
+      <div class="user-center" @click="$router.push({ name: 'PublishOrder' })">
         <el-button type="primary">我要发布</el-button>
         <el-menu
           menu-trigger="hover"
@@ -48,7 +52,6 @@
 <script>
 import { computed, ref, toRefs } from "vue";
 import { useStore } from "vuex";
-import { searchByKeywords } from "network/header.js";
 import { logout } from "network/user.js";
 import { ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
@@ -59,9 +62,6 @@ export default {
     const router = useRouter();
     const user = computed(() => store.state.user);
     const keywords = ref("");
-    const search = () => {
-      searchByKeywords(keywords);
-    };
     const toLogout = () => {
       ElMessageBox.confirm("确定要退出当前账号吗？", "提示", {
         confirmButtonText: "确定",
@@ -80,7 +80,6 @@ export default {
     return {
       ...toRefs(user),
       keywords,
-      search,
       toLogout,
     };
   },
@@ -107,6 +106,7 @@ header {
 .logo {
   height: 42px;
   line-height: 42px;
+  cursor: pointer;
 }
 
 .login {

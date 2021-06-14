@@ -6,7 +6,7 @@ import router from '@/router';
 
 export function request(config) {
   const instance = axios.create({
-    baseURL: '',
+    baseURL: 'http://localhost:8080',
     timeout: 6000,
   });
 

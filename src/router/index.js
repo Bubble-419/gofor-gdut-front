@@ -3,7 +3,7 @@ import {
   createWebHashHistory
 } from 'vue-router'
 
-// import store from '@/store/index.js'
+import store from '@/store/index.js'
 
 const routes = [{
     path: '/',
@@ -18,21 +18,44 @@ const routes = [{
     path: '/login',
     name: "LoginPage",
     component: () => import('views/login/LoginPage.vue'),
+    meta: {
+      title: 'gdut-gofor | 登录'
+    }
   },
   {
     path: '/publish',
     name: 'PublishOrder',
     component: () => import('views/PublishOrder.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'gdut-gofor | 发布订单'
+    },
   },
   {
-    path: '/orders/detail/:orderId',
+    path: '/orders/detail/:orderId(\\d+)',
     name: 'Detail',
     component: () => import('views/Detail.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'gdut-gofor | 订单详情'
+    },
+  }, {
+    path: '/orders/update/:orderId(\\d+)',
+    name: 'UpdateOrder',
+    component: () => import('views/UpdateOrder.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'gdut-gofor | 修改订单详情'
+    },
   },
   {
     path: '/center',
     name: 'UserCenter',
     component: () => import('views/user-center/UserCenter.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'gdut-gofor | 个人中心页'
+    },
     children: [{
         path: '/userinfo',
         name: 'UserInfo',
@@ -49,8 +72,28 @@ const routes = [{
         path: '/my-published',
         name: 'MyPublished',
         component: () => import('views/user-center/MyPublished.vue'),
+      }, {
+        path: '/history',
+        name: 'MyHistory',
+        component: () => import('views/user-center/MyHistory.vue'),
+      }, {
+        path: '/security',
+        name: 'Security',
+        component: () => import('views/user-center/Security.vue'),
+      }, {
+        path: '/complain',
+        name: 'Complain',
+        component: () => import('views/user-center/Complain.vue'),
       }
     ]
+  },
+  {
+    path: '/search/:keywords',
+    name: "SearchResult",
+    component: () => import('views/SearchResult.vue'),
+    meta: {
+      title: 'gdut-gofor | 搜索结果'
+    }
   }
 ]
 
@@ -59,18 +102,24 @@ const router = createRouter({
   routes
 })
 
-// router.beforeEach((to, from, next) => {
-//   if (to.path == '/' || to.path == '/home' || to.path == '/login') {
-//     next();
-//   } else {
-//     if (!store.state.user.isLogin) {
-//       next({
-//         path: '/login'
-//       });
-//     } else {
-//       next();
-//     }
-//   }
-// });
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !store.state.user.isLogin) {
+    next({
+      name: 'LoginPage'
+    })
+  } else {
+    next();
+  }
+});
+
+router.afterEach((to, from, next) => {
+  if (to.meta.title) {
+    document.title = to.meta.title;
+    next();
+  } else {
+    document.title = 'gdut-gofor | 广工人的跑腿系统';
+    next();
+  }
+})
 
 export default router

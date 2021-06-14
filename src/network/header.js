@@ -2,13 +2,10 @@ import {
   request
 } from './request';
 
-export function searchByKeywords(keywords) {
+export function searchByKeywords(params) {
   return request({
-    // 假设api
-    url: `/search/${keywords}`,
+    url: `/orders/search`,
     method: 'post',
-    params: {
-      keywords: keywords
-    }
+    params
   })
 }

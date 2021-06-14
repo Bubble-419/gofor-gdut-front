@@ -11,11 +11,11 @@ export function getDetail(params) {
 }
 
 // 创建订单
-export function publishOrder(params) {
+export function publishOrder(data) {
   return request({
     url: '/orders/publish',
     method: 'post',
-    params
+    data
   })
 }
 
@@ -35,55 +35,78 @@ export function receivedOrders(params) {
 }
 
 // 修改订单信息
-export function uodateOrder(params) {
+export function updateOrder(data) {
   return request({
     url: '/orders/update',
     method: 'put',
-    params
+    data
   })
 }
 
 // 取消订单
-export function cancelOrder(params) {
+export function cancelOrder(data) {
   return request({
     url: '/orders/cancel',
     method: 'put',
-    params
+    data
   })
 }
 
 // 接受订单
-export function receiveOrder(params) {
+export function receiveOrder(data) {
   return request({
     url: '/orders/receive',
     method: 'put',
-    params
+    data
   })
 }
 
 // 完成订单
-export function finishOrder(params) {
+export function finishOrder(data) {
   return request({
     url: '/orders/finish',
     method: 'put',
-    params
+    data
   })
 }
 
 // 评价订单
-export function commentOrder(params) {
+export function commentOrder(data) {
   return request({
     url: '/orders-comment/comment',
     method: 'post',
-    params
+    data
   })
 }
 
 // 回复评价
-export function commentRepalyOrder(params) {
+export function commentRepalyOrder(data) {
   return request({
     url: '/orders-comment-replay/replay',
     method: 'post',
+    data
+  })
+}
+
+// 获取评价
+export function getComment(params) {
+  return request({
+    url: '/orders-comment/getComment',
+    params
+  })
+}
+
+//获取回复
+export function getRepay(params) {
+  return request({
+    url: '/orders-comment-replay/getReplay',
+    params
+  })
+}
+// 历史浏览
+export function getHistory(params) {
+  return request({
+    url: '/orders/history',
     params
   })
 }

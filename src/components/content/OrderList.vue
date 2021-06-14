@@ -5,13 +5,11 @@
       v-for="order in orderList"
       :key="order.orderId"
       :order="order"
-      :publisherId="order.publisherId"
     ></order>
   </div>
 </template>
 
 <script>
-import { reactive } from "vue";
 import Order from "./Order.vue";
 export default {
   name: "OrderList",
@@ -26,14 +24,6 @@ export default {
       },
       // required: true,
     },
-  },
-  setup() {
-    const state = reactive({
-      
-    });
-    return {
-      state,
-    };
   },
 };
 </script>
