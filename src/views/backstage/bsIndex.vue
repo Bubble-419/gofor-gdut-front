@@ -58,7 +58,7 @@
               <el-image
                   style="width: 42px; height: 42px;border-radius: 50%;float: right;margin:4px 20px 0 0;"
                   :src="$store.state.user.userIcon"
-                  ></el-image>
+              ></el-image>
             </div>
           </div>
         </el-header>
@@ -78,7 +78,7 @@
 
 <script>
 export default {
-  name: 'App',
+  name: 'bsIndex',
   components: {
   },
   setup(){
@@ -95,20 +95,7 @@ export default {
 </script>
 
 <style>
-@import 'assets/css/base.css';
 @import "~@/assets/font_2480508_aj02sl1l2qj/iconfont.css";
-html,body{
-  height: 100%;
-  width: 100%;
-}
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  height: 100%;
-}
 .common-layout{
   height: 100%;
 }
@@ -156,7 +143,6 @@ html,body{
   margin: 25px 0;
 }
 .footer{
-  /*background-color: #ffffff;*/
   height: 100px;
   color: rgb(132,133,170);
   text-align: center;
