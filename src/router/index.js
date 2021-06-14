@@ -5,39 +5,37 @@ import {
 
 import store from '@/store/index.js'
 
-const routes = [
-    {
-        path:'/',
-        redirect: '/home'
-    },
-    {
-        path: '/home',
-        name: 'Home',
-        component: () => import('views/home/Home.vue'),
-    },{
+const routes = [{
+    path: '/',
+    redirect: '/home'
+  },
+  {
+    path: '/home',
+    name: 'Home',
+    component: () => import('views/home/Home.vue'),
+  }, {
     path: '/bsIndex',
     name: 'bsIndex',
     component: () => import('views/backstage/bsIndex.vue'),
-    children: [
-      {
-        path:'/OrderList',
-        name:'OrderList',
-        component:() => import('views/backstage/OrderList.vue')
+    children: [{
+        path: '/OrderList',
+        name: 'OrderList',
+        component: () => import('views/backstage/OrderList.vue')
       },
       {
         path: '/UsersList',
-        name:'UsersList',
-        component:() => import('views/backstage/UsersList.vue')
+        name: 'UsersList',
+        component: () => import('views/backstage/UsersList.vue')
       },
       {
-        path:'/show-echart',
-        name:'show-echart',
-        component:() => import('views/backstage/show-echart.vue')
+        path: '/show-echart',
+        name: 'show-echart',
+        component: () => import('views/backstage/show-echart.vue')
       },
       {
-        path:'/ComplainCase',
-        name:'ComplainCase',
-        component:() => import('views/backstage/ComplainCase.vue')
+        path: '/ComplainCase',
+        name: 'ComplainCase',
+        component: () => import('views/backstage/ComplainCase.vue')
       }
     ]
   },
