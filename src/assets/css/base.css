@@ -1,12 +1,14 @@
 @import "./normalize.css";
+@import "./iconfont.css";
 
 :root {
-  --theme-light-greem: #D8E6E7;
+  --theme-light-green: #D8E6E7;
   --theme-medium-green: #9DC3C1;
   --theme-dark-green: #77AAAD;
   --font-title-color: #6E7783;
   --font-color: #494949;
   --bg-color: #f4f7f7;
+  --price-color: #FE5B1A;
 }
 
 * {
@@ -19,6 +21,12 @@ body {
   color: var(--font-color);
 }
 
+main,
+.w {
+  width: 1000px;
+  margin: auto;
+}
+
 a {
   color: var(--font-color);
   text-decoration: none;
@@ -26,4 +34,23 @@ a {
 
 li {
   list-style: none;
+}
+
+button,
+input:focus {
+  outline: 0;
+}
+
+.el-descriptions :not(.is-bordered) td {
+  padding-bottom: 20px;
+  font-size: 1.1em;
+}
+
+.el-descriptions__label {
+  padding-right: 35px;
+}
+
+.el-descriptions__content {
+  font-weight: 700;
+
 }

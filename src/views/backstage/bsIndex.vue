@@ -14,7 +14,7 @@
                 text-color="#fff"
                 router=true
                 active-text-color="#ffd04b">
-              <div class="iconfont el-logo" style="font-size: 30px; color: var(--theme-light-greem);">&#xe844;
+              <div class="iconfont el-logo" style="font-size: 30px; color: var(--theme-light-green);">&#xe844;
                 <p style="display: inline-block; margin-left: 13px; font-size: 21px;">校园跑腿</p>
               </div>
               <el-submenu index="4">
@@ -48,12 +48,12 @@
       <el-container>
         <el-header style="height: 50px;">
           <div>
-            <i class="iconfont" style="font-size: 35px;float: left;margin-top: 5px;color: var(--theme-light-greem)">&#xe651;
+            <i class="iconfont" style="font-size: 35px;float: left;margin-top: 5px;color: var(--theme-light-green)">&#xe651;
               <span style="font-size: 20px">后台管理</span>
             </i>
           </div>
           <div class="demo-image">
-            <div style="float: right;line-height: 42px;color: var(--theme-light-greem);margin-right: 10px">{{ $store.state.user.name }}</div>
+            <div style="float: right;line-height: 42px;color: var(--theme-light-green);margin-right: 10px">{{ $store.state.user.name }}</div>
             <div class="block">
               <el-image
                   style="width: 42px; height: 42px;border-radius: 50%;float: right;margin:4px 20px 0 0;"
@@ -97,7 +97,7 @@ export default {
 <style>
 @import "~@/assets/font_2480508_aj02sl1l2qj/iconfont.css";
 .common-layout{
-  height: 100%;
+  height: 100vh!important;
 }
 .el-header{
   background-color: var(--theme-dark-green);
@@ -119,6 +119,7 @@ export default {
   display: flex!important;
   flex-direction: column;
   justify-content: space-between;
+  width: 100%;
 }
 #showcontainer{
   flex: 1;
