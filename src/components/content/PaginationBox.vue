@@ -7,8 +7,8 @@
         :page-sizes="[20, 30, 40, 50]"
         :page-size="pageSize"
         layout="total, sizes, prev, pager, next, jumper"
-        :total="400"
-        :hide-on-single-page="true">
+        :total="totalpage"
+        >
     </el-pagination>
   </div>
 </template>
@@ -20,7 +20,8 @@ export default {
   name: "PaginationBox",
   props:{
     totalpage:{
-      type:Number
+      type:Number,
+      default:0
     }
   },
   emits:['page','size'],

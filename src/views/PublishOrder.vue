@@ -2,10 +2,10 @@
   <div id="publish-order">
     <my-header></my-header>
     <el-form
-      :model="orderForm"
-      ref="orderInfo"
-      :rules="rules"
-      class="w order-form"
+        :model="orderForm"
+        ref="orderInfo"
+        :rules="rules"
+        class="w order-form"
     >
       <el-form-item prop="publisherContact" label="手机号码(仅对接单人可见)">
         <el-input v-model.number="orderForm.publisherContact"></el-input>
@@ -13,10 +13,10 @@
       <el-form-item prop="orderCategoryId" label="派单类型">
         <el-select v-model="orderForm.orderCategoryId" placeholder="请选择">
           <el-option
-            v-for="c in orderCategory"
-            :key="c.id"
-            :label="c.name"
-            :value="c.id"
+              v-for="c in orderCategory"
+              :key="c.id"
+              :label="c.name"
+              :value="c.id"
           ></el-option>
         </el-select>
       </el-form-item>
@@ -28,10 +28,10 @@
       </el-form-item>
       <el-form-item prop="orderNote" label="备注">
         <el-input
-          type="textarea"
-          :rows="3"
-          v-model="orderForm.orderNote"
-          placeholder="说说你还需要什么..."
+            type="textarea"
+            :rows="3"
+            v-model="orderForm.orderNote"
+            placeholder="说说你还需要什么..."
         ></el-input>
       </el-form-item>
       <el-form-item prop="price" label="价格">
@@ -48,15 +48,15 @@
 
 <script>
 import MyHeader from "components/content/MyHeader";
-import { useStore } from "vuex";
-import { reactive, ref, toRefs } from "vue";
-import { checkPhone } from "@/utils/formRules.js";
-import { publishOrder } from "network/order.js";
-import { useRouter } from "vue-router";
+import {useStore} from "vuex";
+import {reactive, ref, toRefs} from "vue";
+import {checkPhone} from "@/utils/formRules.js";
+import {publishOrder} from "network/order.js";
+import {useRouter} from "vue-router";
 
 export default {
   name: "PublishOrder",
-  components: { MyHeader },
+  components: {MyHeader},
   setup() {
     const store = useStore();
     const router = useRouter();
@@ -69,20 +69,26 @@ export default {
         takeAddress: "",
         sendAddress: "",
         orderNote: "",
-        price: 0,
+        price: "",
       },
       rules: {
-        publisherContact: [{ validator: checkPhone, trigger: "blur" }],
+        publisherContact: [{validator: checkPhone, trigger: "blur"}],
         takeAddress: [
-          { required: true, message: "取货地址不能为空", trigger: "blur" },
+          {required: true, message: "取货地址不能为空", trigger: "blur"},
         ],
         sendAddress: [
-          { required: true, message: "送货地址不能为空", trigger: "blur" },
+          {required: true, message: "送货地址不能为空", trigger: "blur"},
         ],
         price: [
-          { required: true, message: "价格不能为空", trigger: "blur" },
-          { type: "number", message: "请输入正确的数字" },
-          { min: 0, message: "价格不能低于0元", trigger: "blur" },
+          {required: true, message: "价格不能为空"},
+          {type: 'number', message: "请输入正确的数字"},
+          {
+            validator: (rules, value, callback) => {
+              if (value <= 0) {
+                return callback(new Error("价格不能低于0元"));
+              } else callback();
+            }
+          }
         ],
       },
     });
@@ -92,10 +98,8 @@ export default {
         if (valid) {
           orderInfo.value = state.orderForm;
           publishOrder(orderInfo.value).then((res) => {
-            if (res.status == "200") {
-              setTimeout(() => {
-                router.push({ name: "Home" });
-              }, 1000);
+            if (res.code == 200) {
+              router.push({name: 'MyPublished'});
             }
           });
         }

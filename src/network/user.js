@@ -34,7 +34,7 @@ export function getUserInfo() {
 
 export function getUserInfoById(params) {
   return request({
-    url: '/users/getUserById',
+    url: '/admin/getUserById',
     params
   })
 }

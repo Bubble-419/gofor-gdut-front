@@ -29,7 +29,7 @@ export default {
       getHistory({
         username: store.state.user.username,
       }).then((res) => {
-        state.orderList = res.object.records;
+        state.orderList = res.object;
       });
     });
     return {

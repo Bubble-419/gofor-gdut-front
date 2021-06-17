@@ -14,7 +14,9 @@
       <LineChart :OrdernumsData="OrderweekData" :times="week" class="chart" v-show="value1=='堆叠折线图'"/>
       <BarChart :OrdernumsData="OrderweekData" :times="week" class="chart" v-show="value1!='堆叠折线图'" />
     </div>
+    <div class="container">
     <DoughnutChart :OrdernumsData="OrderweekData" :times="week" class="chart" />
+    </div>
     <div class="container">
       <el-tooltip :content="'视图: ' + value2" placement="top">
         <el-switch
@@ -29,7 +31,9 @@
       <LineChart :OrdernumsData="OrdermonthData"  :times="month" class="chart" v-show="value2=='堆叠折线图'"/>
       <BarChart :OrdernumsData="OrdermonthData"  :times="month" class="chart" v-show="value2!='堆叠折线图'" />
     </div>
+    <div class="container">
     <DoughnutChart :OrdernumsData="OrdermonthData" :times="month" class="chart" />
+    </div>
   </div>
 </template>
 
@@ -90,18 +94,14 @@ export default {
 .wrapper {
   height: 100%;
   display: grid;
-  grid-template-columns:auto auto;
+  grid-template-columns:50% 50%;
+  grid-template-rows: 50% 50%;
   background-color: #E9EEF3;
   position: relative;
-  /*background: hsl(210, 20%, 10%);*/
-  /*display: flex;*/
-  /*justify-content: space-between;*/
 }
 .wrapper .chart {
-  width: 800px;
-  height: 400px;
-  padding: 10px;
-  margin-bottom: 20px;
+  width: 86vh;height: 50vh;
+  margin-bottom: 5vh;
 }
 .chart{
   background-color: #ffffff;
@@ -113,7 +113,7 @@ export default {
 .el-switch{
   position: absolute;
   z-index: 1;
-  right: 145px;
-  top: 15px;
+  right: 3vh;
+  top: 6vh;
 }
 </style>

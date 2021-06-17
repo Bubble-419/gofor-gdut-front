@@ -1,9 +1,15 @@
+//新建代理的类
 let proxyObj = {};
 
+//所有需要代理的路径
 proxyObj['/'] = {
+  //websocket
   ws: false,
+  //目标地址
   target: 'http://localhost:8081',
+  //发送请求头host会被设置target（目标地址）
   changeOrigin: true,
+  //不重写请求地址
   pathReWrite: {
     '^/': '/'
   }

@@ -24,7 +24,7 @@
     </div>
   </div>
   <el-table
-      :data="tableData"
+      :data="orderlist"
       ref="filterTable"
       style="width: 100%">
     <el-table-column type="expand">
@@ -39,8 +39,8 @@
           <el-form-item label="联系方式">
             <span>{{ props.row.publisherContact }}</span>
           </el-form-item>
-          <el-form-item label="创建时间">
-            <span>{{ props.row.createTime }}</span>
+          <el-form-item label="创建时间" :formatter="dateFormat">
+            <span>{{ moment(props.row.createTime).format("YYYY-MM-DD HH:mm:ss") }}</span>
           </el-form-item>
           <el-form-item label="接单人 ID">
             <span>{{ props.row.receiverId }}</span>
@@ -52,10 +52,10 @@
             <span>{{ props.row.price }}</span>
           </el-form-item>
           <el-form-item label="接收时间">
-            <span>{{ props.row.receiveTime }}</span>
+            <span>{{ moment(props.row.receiveTime).format("YYYY-MM-DD HH:mm:ss") }}</span>
           </el-form-item>
-          <el-form-item label="完成时间">
-            <span>{{ props.row.finishedTIme }}</span>
+          <el-form-item label="完成时间" :formatter="dateFormat">
+            <span>{{ moment(props.row.finishedTIme).format("YYYY-MM-DD HH:mm:ss") }}</span>
           </el-form-item>
           <el-form-item label="取货地址">
             <span>{{ props.row.takeAddress }}</span>
@@ -75,6 +75,7 @@
         sortable
         width="180"
         column-key="date"
+        :formatter="dateFormat"
     >
     </el-table-column>
     <el-table-column
@@ -97,6 +98,7 @@
       </template>
     </el-table-column>
     <el-table-column
+        width="200"
         label="订单 ID"
         prop="orderId">
     </el-table-column>
@@ -134,6 +136,7 @@ import PaginationBox from '@/components/content/PaginationBox';
 import { ref, onMounted, watch} from 'vue';
 import { allorders ,dateorders ,searchbyorderid  } from 'network/Orderlist.js';
 import {ElMessage} from "element-plus";
+import moment from "moment";
 export default {
   name: "OrderList",
   components:{
@@ -141,7 +144,7 @@ export default {
     PaginationBox
   },
   setup() {
-    const orderlist =ref();
+    let orderlist =ref();
     let totalpage =ref();       //总页数
     let pagesize =ref(20); //每一页数量
     let screen =ref();  //记录筛选类型
@@ -149,22 +152,16 @@ export default {
     let day =ref();
     let allOrders =(currentpage,pagesize)=>{
       allorders(currentpage,pagesize).then(res =>{
-        const complains=res.object.records.filter((item)=>{
-          item.createTime=new Date(item?.createTime);
-        })
-        orderlist.value=complains;
-        totalpage.value=res.total;
-        console.log(res);
+        orderlist.value=res.object.records;
+        totalpage.value=res.object.total;
       });
     }
     let dateOrders = (currentpage,pagesize,time)=>{
+      time =moment(time).format("YYYY-MM-DD")
       dateorders(currentpage,pagesize,time).then(res =>{
-        const complains=res.object.records.filter((item)=>{
-          item.createTime=new Date(item?.createTime);
-        })
-        orderlist.value=complains;
-        totalpage.value=res.total;
-        console.log(res);
+        orderlist.value=[];
+        orderlist.value=res.object.records;
+        totalpage.value=res.object.total;
       });
     }
     onMounted(()=>{
@@ -260,7 +257,7 @@ export default {
       }
     }
     const filterTag = (value, row) => {
-      return row.categoryId === value;
+      return row.orderCategoryId === value;
     }
     //禁用未来的日期
     const disabledDate=(time)=>{
@@ -286,15 +283,33 @@ export default {
     }]
 
     const searchId=(data)=>{
-      searchbyorderid(data).then(res =>{
-        // usersData.value=res.object;
-        console.log(res);
-      }).catch(() =>{
-        ElMessage.success({
-          message: '查询失败！请重新输入',
-          type: 'warning'
+      if(data!=''){
+        searchbyorderid(data).then(res =>{
+          orderlist.value=[];
+          orderlist.value.push(res.object);
+          ElMessage.success({
+            message: '查询成功！',
+            type: 'warning'
+          });
+        }).catch(() =>{
+          ElMessage.success({
+            message: '查询失败！请重新输入',
+            type: 'warning'
+          });
         });
-      });
+      }else{
+        screen.value ='no';
+        allOrders(1,20);
+      }
+
+    }
+    //日期格式化
+    const dateFormat =(row,column)=>{
+      let date =row[column.property];
+      if(date === undefined){
+        return ''
+      }
+      return moment(date).format("YYYY-MM-DD HH:mm:ss")
     }
     return {
       typeColor,
@@ -310,7 +325,11 @@ export default {
       shortcuts,
       Status,
       type,
-      searchId
+      searchId,
+      orderlist,
+      dateFormat,
+      moment,
+      totalpage
     }
 
   }

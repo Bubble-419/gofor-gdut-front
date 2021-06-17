@@ -31,7 +31,7 @@ export default {
     // 获取订单列表
     const getList = () => {
       receivedOrders({
-        publisherId: store.state.user.userId,
+        receiverId: store.state.user.userId,
         currentPage: state.currentPage,
         size: state.pageSize,
       }).then((res) => {

@@ -1,65 +1,77 @@
 import axios from 'axios';
 import {
-  ElMessage
+	ElMessage
 } from 'element-plus';
 import router from '@/router';
 
 export function request(config) {
-  const instance = axios.create({
-    baseURL: 'http://localhost:8080',
-    timeout: 6000,
-  });
+	const instance = axios.create({
+		// baseURL: 'http://39.108.133.73:8080',
+		baseURL:'http://localhost:8080',
+		timeout: 6000,
+	});
 
-  // 请求拦截
-  instance.interceptors.request.use(config => {
-    // 判断登陆权限
-    const token = window.localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = 'Bearer ' + token;
-    }
-    return config;
-  }, err => {
-    console.log(err);
-  });
+	// 请求拦截
+	instance.interceptors.request.use(config => {
+		// 判断登陆权限
+		const token = window.localStorage.getItem('token');
+		if (token) {
+			config.headers.Authorization = 'Bearer ' + token;
+		}
+		return config;
+	}, err => {
+		console.log(err);
+	});
 
-  // 响应拦截
-  instance.interceptors.response.use(res => {
-    // 成功调用接口，但后端返回了一些错误提示
-    // 业务逻辑错误
-    if (res.status && res.status == 200) {
-      if (res.data.code == 500 || res.data.code == 401 || res.data.code == 403) {
-        ElMessage.error({
-          message: res.data.message
-        });
-        return;
-      }
-      // 成功提示
-      if (res.data.message) {
-        ElMessage.success({
-          message: res.data.message
-        });
-      }
-    }
-  }, err => {
-    // 没有调用到接口
-    // 401权限错误，转到登录页
-    if (err.response.code == 504 || err.response.code == 404) {
-      ElMessage.error({
-        message: '找不到服务器！'
-      })
-    } else if (err.response.code == 403) {
-      ElMessage.error({
-        message: '权限不足！'
-      })
-    } else if (err.response.code == '401') {
-      ElMessage.warning({
-        message: '请先登录',
-      })
-      router.push({
-        name: 'LoginPage'
-      });
-    }
-  });
+	// 响应拦截
+	instance.interceptors.response.use(res => {
+		// 成功调用接口，但后端返回了一些错误提示
+		// 业务逻辑错误
+		if (res.status && res.status == 200) {
+			if (res.data.code == 500 || res.data.code == 401 || res.data.code == 403) {
+				ElMessage.error({
+					message: res.data.message
+				});
+				return Promise.reject(res);
+			}
+			// 成功提示
+			else if (res.data.message) {
+				ElMessage.success({
+					message: res.data.message
+				});
+			}
+			return res.data;
+		}
+	}, err => {
+		// 没有调用到接口
+		// 401权限错误，转到登录页
+		if (err.response.code == 504 || err.response.code == 404) {
+			ElMessage.error({
+				message: '找不到服务器！'
+			})
+		} else if (err.response.code == 403) {
+			ElMessage.error({
+				message: '权限不足！'
+			})
+		} else if (err.response.code == '401') {
+			ElMessage.warning({
+				message: '请先登录',
+			})
+			router.push({
+				name: 'LoginPage'
+			});
+		}
+	});
 
-  return instance(config);
+	return instance(config);
 }
+
+// //传送json格式的post请求
+// let base = '';
+// export const postRequest = (url,params)=>{
+//   return axios({
+//     method: 'post',
+//     url: '${base}${url}',
+//     data: params
+//   })
+// }

@@ -1,17 +1,17 @@
 <template>
   <el-card
-    id="order-box"
-    @click="
-      this.$router.push({ name: 'Detail', params: { orderId: order.orderId } })
+      id="order-box"
+      @click="
+      $router.push({ name: 'Detail', params: { orderId: order.orderId } })
     "
   >
     <el-space :size="20" class="publisher-info">
       <el-avatar size="large" :src="publisher.publisherIcon"></el-avatar>
       <span>{{ publisher.publisherName }}</span>
       <span
-        class="phone"
-        v-show="store.state.user.userId == order.receiverId"
-        >{{ publisher.publisherContact }}</span
+          class="phone"
+          v-show="store.state.user.userId == order.receiverId"
+      >{{ publisher.publisherContact }}</span
       >
     </el-space>
     <el-card shadow="never" class="order">
@@ -34,9 +34,10 @@
 </template>
 
 <script>
-import { getUserInfoById } from "network/user.js";
-import { reactive, toRefs, onMounted } from "vue";
-import { useStore } from "vuex";
+import {getUserInfoById} from "network/user.js";
+import {reactive, toRefs} from "vue";
+import {useStore} from "vuex";
+
 export default {
   name: "Order",
   props: {
@@ -45,10 +46,18 @@ export default {
       default: function () {
         return {};
       },
-      // required: true,
+      required: true,
     },
   },
   setup(props) {
+    console.log('props.order.publisherId:' + props.order.publisherId)
+    getUserInfoById({userId: props.order.publisherId}).then((res) => {
+      console.log('res.object.username' + res.object.username)
+      state.publisher.publisherName = res.object.name;
+      state.publisher.publisherIcon = res.object.userIcon;
+      state.publisher.publisherContact = res.object.userContact;
+      console.log('state.publisher.publisherName' + state.publisher.publisherName);
+    });
     const store = useStore();
     const state = reactive({
       publisher: {
@@ -57,17 +66,11 @@ export default {
         publisherContact: 0,
       },
       orderCategoryName: store.getters.getOrderCategory(
-        props.order.orderCategoryId
+          props.order.orderCategoryId
       ),
       orderStatusName: store.getters.getOrderStatus(props.order.orderStatus),
     });
-    onMounted(() => {
-      getUserInfoById({ userId: props.order.publisherId }).then((res) => {
-        state.publisher.publisherName = res.object.userName;
-        state.publisher.publisherIcon = res.object.userIcon;
-        state.publisher.publisherContact = res.object.userContact;
-      });
-    });
+
     return {
       ...toRefs(state),
       store,
@@ -120,6 +123,7 @@ export default {
   font-weight: 700;
   margin-left: 40px;
 }
+
 .phone::after {
   position: absolute;
   right: 20px;

@@ -6,7 +6,7 @@
           <el-col :span="12">
             <el-menu
                 :uniqueOpened="true"
-                default-active="2"
+                default-active="/show-echart"
                 class="el-menu-vertical-demo"
                 @open="handleOpen"
                 @close="handleClose"

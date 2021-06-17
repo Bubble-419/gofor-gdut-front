@@ -5,17 +5,14 @@
 </template>
 
 <script>
-import { getCaptcha } from "network/user.js";
 import { onMounted, reactive, toRefs } from "vue";
 export default {
   setup() {
     const state = reactive({
-      captchaSrc: "",
+      captchaSrc: '/captcha?time='+new Date(),
     });
     const getOrRefresh = () => {
-      getCaptcha().then((res) => {
-        state.captchaSrc = res.object;
-      });
+      state.captchaSrc = '/captcha?time='+new Date();
     };
     onMounted(() => {
       getOrRefresh();
@@ -30,8 +27,10 @@ export default {
 
 <style scoped>
 .captcha {
-  width: 90px;
+  cursor: pointer;
+  width: 100px;
   height: 40px;
+  z-index: 100;
 }
 
 .captcha img {

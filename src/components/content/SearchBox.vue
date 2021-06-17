@@ -17,7 +17,7 @@ import { ref } from 'vue'
 export default {
   name: "SearchBox",
   emits:['search'],
-  setup(context) {
+  setup(props,context) {
     const input1 =ref('');
     const handlesearch=()=>{
       context.emit('search',input1.value)

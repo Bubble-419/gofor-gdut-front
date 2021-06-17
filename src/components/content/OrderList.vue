@@ -22,7 +22,7 @@ export default {
       default: function () {
         return [];
       },
-      // required: true,
+      required: true,
     },
   },
 };

@@ -2,51 +2,39 @@
   <search-box style="padding-bottom: 40px" @search="searchID"></search-box>
     <UserDetail v-show="show" :userDetail="userDetail" @close="closewindow()"></UserDetail>
   <el-table
-      :data="userslist.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
+      :data="userslist"
       style="width: 100%"
       @row-click="(row)=>rowdata(row)">
     <el-table-column
-        width="200%"
         label="权限ID"
         prop="roleId">
     </el-table-column>
     <el-table-column
-        width="250%"
         label="用户ID"
-        prop="useId">
+        prop="userId">
     </el-table-column>
     <el-table-column
-        width="200%"
         label="用户姓名"
         prop="name">
     </el-table-column>
     <el-table-column
-        width="250%"
         label="联系方式"
         prop="userContact">
     </el-table-column>
     <el-table-column
-        width="350%"
         label="地址"
         prop="userPosition">
     </el-table-column>
     <el-table-column
-        width="200%"
         label="详情">
       <template v-slot="scope">
       <el-link href="javascript:;" @click="detail(scope.$index)">个人详情<i class="el-icon-view el-icon--right"></i> </el-link>
         </template>
     </el-table-column>
     <el-table-column
-        width="200%"
         align="right"
-        prop="userStatus">
-      <template #header>
-        <el-input
-            v-model="search"
-            size="mini"
-            placeholder="输入关键字搜索"/>
-      </template>
+        label="操作"
+        >
       <template v-slot="scope">
         <el-dropdown style="margin-right: 10px" trigger="click" @command="handleCommand" v-if="$store.state.user.roleId < scope.row.roleId">
           <el-button size="small">
@@ -65,7 +53,7 @@
             icon="el-icon-info"
             iconColor="red"
             title="是否要更改用户账号状态？"
-            @confirm="changefreezing"
+            @confirm="changefreezing(scope.row)"
         >
           <template #reference>
             <el-button type="danger" size="small" v-if="scope.row.userStatus==0">
@@ -101,15 +89,15 @@ export default {
     let userDetail =ref();
     let totalpage =ref();       //总页数
     let pagesize =ref(20); //每一页数量
+    let currentpage=ref();//当前页面
     let show =ref(false);
     //获取所有用户信息
     const userData =(currentpage,pagesize)=>{
       getUsersData(currentpage,pagesize).then(res =>{
-        const userdatafilter=res.object.records.filter((item)=>{
-          item.createTime=new Date(item?.createTime);
-        })
-        userslist.value=userdatafilter.value;
-        totalpage.value=res.total;
+        console.log(res.object.records)
+        userslist.value=res.object.records;
+        totalpage.value=res.object.total;
+        console.log(totalpage.value)
       });
     }
     onMounted(()=>{
@@ -127,31 +115,41 @@ export default {
     //切换页数和单页数量
     const changepage =(data)=>{
       userData(data,pagesize.value);
+      currentpage.value=data;
     }
     const changesize =(data)=>{
       userData(1,data);
+      currentpage.value=1;
     }
     const searchID =(data)=>{
-      searchuser(data).then(res =>{
-        userslist.value=res.object.records;
-      }).catch(()=>{
-        ElMessage.success({
-          message: '输入有误或该用户不存在！',
-          type: 'warning'
-        });
-      })
+      if(data!=''){
+        searchuser(data).then(res =>{
+          userslist.value=[];
+          userslist.value.push(res.object);
+        }).catch(()=>{
+          ElMessage.success({
+            message: '输入有误或该用户不存在！',
+            type: 'warning'
+          });
+        })
+      }else{
+        userData(1,20);
+      }
+
     }
     //点击某一行即可获取该行数据
     const rowprop = ref();
     const rowdata =(row)=>{
       rowprop.value=row;
     }
-    const changefreezing=()=>{
-      freezing(rowprop.value.username,rowprop.value.userStatus==0?1:0).then(() =>{
+    //修改冻结状态
+    const changefreezing=(row)=>{
+      freezing({username:row.username,userStatus:row.userStatus}).then(() =>{
         ElMessage.success({
           message: '冻结状态已修改成功！',
           type: 'success'
         });
+        userData(currentpage.value,pagesize.value);
       }).catch(() =>{
         ElMessage.warning({
           message: '失败操作！',
@@ -161,12 +159,12 @@ export default {
     }
     //修改权限
     const handleCommand=(command)=>{
-      role(rowprop.value.userId,command).then(res =>{
-        console.log(res);
+      role({username:rowprop.value.username,rid:command}).then(() =>{
         ElMessage.success({
           message: '用户'+rowprop.value.userId+'权限修改成功！',
           type: 'success'
         });
+        userData(currentpage.value,pagesize.value);
       }).catch(() =>{
         ElMessage.warning({
           message: '失败操作！',
@@ -187,7 +185,8 @@ export default {
       handleCommand,
       rowdata,
       changepage,
-      changesize
+      changesize,
+      totalpage
     }
   }
 }

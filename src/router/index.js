@@ -137,13 +137,11 @@ router.beforeEach((to, from, next) => {
   }
 });
 
-router.afterEach((to, from, next) => {
+router.afterEach((to) => {
   if (to.meta.title) {
     document.title = to.meta.title;
-    next();
   } else {
     document.title = 'gdut-gofor | 广工人的跑腿系统';
-    next();
   }
 })
 

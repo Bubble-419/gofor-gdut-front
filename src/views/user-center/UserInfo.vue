@@ -2,14 +2,15 @@
   <div id="user-info">
     <!-- 头像上传模块，上传地址action待修改 -->
     <el-upload
-      class="avator-upload"
-      action="https://jsonplaceholder.typicode.com/posts/"
-      :show-file-list="false"
-      :multiple="false"
-      :on-success="handleAvatarSuccess"
-      :before-upload="beforeAvatarUpload"
+        class="avatar-upload"
+        action="http://the5gofor.oss-cn-guangzhou.aliyuncs.com"
+        :data="avatar"
+        :show-file-list="false"
+        :multiple="false"
+        :on-success="handleAvatarSuccess"
+        :before-upload="beforeAvatarUpload"
     >
-      <img v-if="user.userIcon" :src="user.userIcon" class="avatar" />
+      <img v-if="user.userIcon" :src="user.userIcon" class="avatar"/>
       <i v-else class="el-icon-plus avatar-uploader-icon"></i>
     </el-upload>
     <!-- 其他修改信息模块 -->
@@ -19,23 +20,24 @@
       </el-form-item>
       <el-form-item label="联系方式" prop="userContact">
         <el-input
-          :placeholder="user.userContact"
-          v-model="user.userContact"
+            :placeholder="user.userContact"
+            v-model="user.userContact"
         ></el-input>
       </el-form-item>
       <el-form-item label="所在校区">
         <el-select v-model="user.userPosition">
           <el-option
-            v-for="p in positions"
-            :key="p.value"
-            :label="p.label"
-            :value="p.value"
+              v-for="p in positions"
+              :key="p.value"
+              :label="p.label"
+              :value="p.value"
           ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onUpdate" :disabled="isDisabled"
-          >确认修改</el-button
+        >确认修改
+        </el-button
         >
       </el-form-item>
     </el-form>
@@ -43,11 +45,12 @@
 </template>
 
 <script>
-import { getUserInfo, updateUserInfo } from "network/user.js";
-import { onMounted, reactive, toRefs, watch } from "vue";
-import { onBeforeRouteLeave } from "vue-router";
-import { ElMessageBox } from "element-plus";
-import { useStore } from "vuex";
+import {getUserInfo, updateUserInfo} from "network/user.js";
+import {policy} from "network/oss.js"
+import { reactive, toRefs, watch} from "vue";
+import {onBeforeRouteLeave} from "vue-router";
+import {ElMessageBox} from "element-plus";
+import {useStore} from "vuex";
 
 export default {
   name: "UserInfo",
@@ -57,53 +60,84 @@ export default {
       user: {},
       isDisabled: true,
       positions: store.state.positions,
+      avatar: {
+        policy: '',
+        signature: '',
+        key: '',
+        ossaccessKeyId: '',
+        dir: '',
+        host: '',
+      }
     });
+    const beforeAvatarUpload = (file) => {
+      return new Promise((resolve, reject) => {
+        policy().then(response => {
+          console.log('accessKeyId:' + response.object.accessKeyId)
+          state.avatar.policy = response.object.policy;
+          state.avatar.signature = response.object.signature;
+          state.avatar.ossaccessKeyId = response.object.accessKeyId;
+          state.avatar.key = response.object.dir + `${file.name}`;
+          state.avatar.dir = response.object.dir;
+          state.avatar.host = response.object.host;
+          resolve(true)
+        }).catch(err => {
+          console.log(err)
+          reject(false)
+        })
+      })
+    };
     const handleAvatarSuccess = (res, file) => {
-      state.user.userIcon = URL.createObjectURL(file.raw);
+      state.user.userIcon = 'https://the5gofor.oss-cn-guangzhou.aliyuncs.com' + '/' + state.avatar.dir + file.name;
     };
     onBeforeRouteLeave((to, from, next) => {
       // 信息已修改但未提交
       if (state.isDisabled == false) {
         ElMessageBox.confirm(
-          "已修改的信息尚未保存，是否离开当前页面？",
-          "提示",
-          {
-            confirmButtonText: "离开页面",
-            cancelButtontext: "留在当前页面",
-            type: "warning",
-          }
+            "已修改的信息尚未保存，是否离开当前页面？",
+            "提示",
+            {
+              confirmButtonText: "离开页面",
+              cancelButtontext: "留在当前页面",
+              type: "warning",
+            }
         )
-          .then(() => {
-            next();
-          })
-          .catch(() => {
-            console.log(to.path, from.path);
-            next(from.path);
-          });
+            .then(() => {
+              next();
+            })
+            .catch(() => {
+              console.log(to.path, from.path);
+              next(from.path);
+            });
       } else next();
     });
     const onUpdate = () => {
       updateUserInfo(state.user);
+      window.localStorage.setItem("user", JSON.stringify(state.user))
+      store.commit("setUser", {
+        user: state.user,
+      });
       state.isDisabled = true;
+      window.location.reload();
     };
-    onMounted(() => {
-      getUserInfo().then((res) => {
+    (async () => {
+      await getUserInfo().then((res) => {
         state.user = res;
       });
       watch(
-        () => [state.user],
-        () => {
-          if (state.isDisabled == true) {
-            state.isDisabled = false;
-          }
-        },
-        { deep: true }
+          () => [state.user],
+          () => {
+            if (state.isDisabled == true) {
+              state.isDisabled = false;
+            }
+          },
+          {deep: true}
       );
-    });
+    })();
 
     return {
       ...toRefs(state),
       onUpdate,
+      beforeAvatarUpload,
       handleAvatarSuccess,
     };
   },
@@ -121,7 +155,7 @@ export default {
   width: 300px;
 }
 
-.avator-upload {
+.avatar-upload {
   width: 120px;
   height: 120px;
   border-radius: 60px;
@@ -133,7 +167,7 @@ export default {
   overflow: hidden;
 }
 
-img.avator {
+img.avatar {
   width: 120px;
   height: 120px;
   object-fit: cover;

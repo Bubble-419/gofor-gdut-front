@@ -53,10 +53,11 @@ export function cancelOrder(data) {
 }
 
 // 接受订单
-export function receiveOrder(data) {
+export function receiveOrder(params,data) {
   return request({
     url: '/orders/receive',
     method: 'put',
+    params,
     data
   })
 }

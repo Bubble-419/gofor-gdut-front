@@ -1,34 +1,35 @@
 <template>
   <header>
     <div class="logo" @click="$router.push({ name: 'Home' })">
-      <img src="~assets/images/logo.png" alt="" />
+      <img src="~assets/images/logo.png" alt=""/>
     </div>
     <div class="search">
       <input
-        type="search"
-        placeholder="请按地址搜索..."
-        class="search"
-        v-model="keywords"
-        @keyup.enter="
+          type="search"
+          placeholder="请按地址搜索..."
+          class="search"
+          v-model="keywords"
+          @keyup.enter="
           $router.push({ name: 'SearchResult', params: { keywords } })
         "
       />
     </div>
-    <div v-if="isLogin" key="loginHeader" class="login-header">
-      <router-link to="/bsIndex" tag="span" class="manager" v-if="roleId < 3"
-        >管理员入口</router-link
+    <div v-if="user.isLogin" key="loginHeader" class="login-header">
+      <router-link to="/show-echart" tag="span" class="manager" v-if="user.roleId ==1||user.roleId ==2"
+      >管理员入口
+      </router-link
       >
       <div class="user-center" @click="$router.push({ name: 'PublishOrder' })">
         <el-button type="primary">我要发布</el-button>
         <el-menu
-          menu-trigger="hover"
-          mode="horizontal"
-          active-text-color="var(--theme-medium-green)"
-          :router="true"
+            menu-trigger="hover"
+            mode="horizontal"
+            active-text-color="var(--theme-medium-green)"
+            :router="true"
         >
           <el-submenu index="1">
             <template #title>
-              <el-avatar size="medium" :src="userIcon"></el-avatar>
+              <el-avatar size="medium" :src="user.userIcon"></el-avatar>
             </template>
             <el-menu-item index="/userinfo">个人中心</el-menu-item>
             <el-menu-item index="/my-published">我的订单</el-menu-item>
@@ -40,27 +41,34 @@
     </div>
 
     <el-button
-      v-else
-      key=""
-      class="login"
-      @click="$router.push({ name: 'LoginPage' })"
-      >登录/注册</el-button
+        v-else
+        key=""
+        class="login"
+        @click="$router.push({ name: 'LoginPage' })"
+    >登录/注册
+    </el-button
     >
   </header>
 </template>
 
 <script>
-import { computed, ref, toRefs } from "vue";
-import { useStore } from "vuex";
-import { logout } from "network/user.js";
-import { ElMessageBox } from "element-plus";
-import { useRouter } from "vue-router";
+import {reactive, ref, toRefs, onMounted} from "vue";
+import {useStore} from "vuex";
+import {logout} from "network/user.js";
+import {ElMessageBox} from "element-plus";
+import {useRouter} from "vue-router";
+
 export default {
   name: "MyHeader",
   setup() {
     const store = useStore();
     const router = useRouter();
-    const user = computed(() => store.state.user);
+    const state = reactive({
+      user: {},
+    })
+    onMounted(() => {
+      state.user = store.state.user;
+    })
     const keywords = ref("");
     const toLogout = () => {
       ElMessageBox.confirm("确定要退出当前账号吗？", "提示", {
@@ -69,16 +77,19 @@ export default {
         type: "warning",
       }).then(() => {
         logout().then((res) => {
-          if (res.status == 200) {
+          if (res.code == 200) {
             // 清除token
             window.localStorage.setItem("token", "");
-            router.go(0);
+            window.localStorage.setItem("user", "");
+            store.commit("setIsLogin", false);
+            store.commit("setUser", {user:''});
+            router.go({name: 'Home'});
           }
         });
       });
     };
     return {
-      ...toRefs(user),
+      ...toRefs(state),
       keywords,
       toLogout,
     };

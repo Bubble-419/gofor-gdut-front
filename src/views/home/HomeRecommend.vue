@@ -25,8 +25,9 @@ export default {
       }),
     });
     const getList = () => {
-      getHomeRecommendList().then((res) => {
-        state.recommendOrderList = res.object;
+      console.log("getList")
+      getHomeRecommendList().then((response) => {
+        state.recommendOrderList = response.object;
       });
     };
     onMounted(() => {
@@ -47,6 +48,7 @@ export default {
 }
 
 .refresh {
+  cursor: pointer;
   margin-top: 80px;
   text-align: center;
   color: var(--theme-dark-green);

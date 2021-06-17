@@ -1,25 +1,29 @@
 import {request} from './request';
 
-export function searchuser(userId){
+export function searchuser(username){
     return request({
-        url:'/users/admin/getUserByName?'+userId,
+        url:'/admin/getUserByName?username='+username,
     })
 }
 
 export function getUsersData(currentPage=1,size=20){
     return request({
-        url:'/users/admin/allUsers?currentPage='+currentPage+'&size='+size,
+        url:'/admin/allUsers?currentPage='+currentPage+'&size='+size,
     })
 }
 
-export function freezing(username,userStatus){
+export function freezing(params){
     return request({
-        url:'/users/admin/userstatus?username='+username+'&userStatus='+userStatus,
+        url:'/admin/userstatus',
+        method:'put',
+        params,
     })
 }
 
-export function role(userId,roleId){
+export function role(params){
     return request({
-        url:'/admin/role?userId='+userId+'&roleId='+roleId,
+        url:'/admin/role',
+        method:'put',
+        params,
     })
 }

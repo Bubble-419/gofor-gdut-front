@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { computed, reactive, ref, toRefs, watch } from "vue";
+import {  reactive, ref, toRefs, watch } from "vue";
 import { useRouter } from "vue-router";
 import { register } from "network/user.js";
 import { checkUsername, checkPwd } from "@/utils/formRules.js";
@@ -58,6 +58,7 @@ export default {
   setup() {
     const router = useRouter();
     const state = reactive({
+      captchaUrl: '/captcha?time='+new Date(),
       regForm: {
         username: "",
         password: "",
@@ -82,7 +83,6 @@ export default {
     watch(
       () => state.regForm.username,
       (username) => {
-        console.log(username);
         if (username.toString().charAt(1) == "1") {
           state.regForm.sex = "男";
         } else if (username.toString().charAt(1) == "2") {
@@ -105,16 +105,14 @@ export default {
     const onSubmit = () => {
       regInfo.value.validate((valid) => {
         if (valid) {
-          regInfo.value = computed(() => {
-            return {
-              username: state.regForm.username,
-              password: state.regForm.password,
-              name: state.regForm.name,
-              sex: state.regForm.sex == "男" ? 0 : 1,
-            };
-          });
+          regInfo.value = {
+            username: state.regForm.username,
+            password: state.regForm.password,
+            name: state.regForm.name,
+            sex: state.regForm.sex == "男" ? 0 : 1,
+          };
           register(state.regForm.captcha, regInfo.value).then((res) => {
-            if (res.status == "200") {
+            if (res.code == 200) {
               setTimeout(() => {
                 router.push({ name: "Home" });
               }, 1000);

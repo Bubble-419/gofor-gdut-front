@@ -1,14 +1,14 @@
 <template>
-  <el-scrollbar height="500px">
+  <el-scrollbar :height="height">
     <order-list :orderList="orderList"></order-list>
     <div class="pagination">
       <el-pagination
-        layout="prev, pager, next"
-        :total="total"
-        :page-size="pageSize"
-        :current-page="currentPage"
-        :hide-on-single-page="true"
-        @current-change="changePage"
+          layout="prev, pager, next"
+          :total="total"
+          :page-size="pageSize"
+          :current-page="currentPage"
+          :hide-on-single-page="true"
+          @current-change="changePage"
       >
       </el-pagination>
     </div>
@@ -29,7 +29,7 @@ export default {
       default: function () {
         return [];
       },
-      // required: true,
+      required: true,
     },
     total: {
       type: Number,
@@ -43,13 +43,17 @@ export default {
       type: Number,
       default: 5,
     },
+    height: {
+      type: String,
+      default: "600px",
+    }
   },
   emits: ["change-page"],
-  setup(props, { emit }) {
+  setup(props, {emit}) {
     const changePage = (val) => {
       emit("change-page", val);
     };
-    return { changePage };
+    return {changePage};
   },
 };
 </script>

@@ -9,29 +9,33 @@
       </el-form-item>
       <el-form-item label="投诉细节" prop="complainDetails">
         <el-input
-          type="textarea"
-          :rows="3"
-          v-model="complainForm.complainDetails"
-          placeholder="描述一下你遇到的问题，不少于10个字，不超过200个字..."
+            type="textarea"
+            :rows="3"
+            v-model="complainForm.complainDetails"
+            placeholder="描述一下你遇到的问题，不少于10个字，不超过200个字..."
         ></el-input>
       </el-form-item>
       <el-form-item class="pic-upload">
         <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          list-type="picture"
-          :limit="1"
-          :on-preview="handlePictureCardPreview"
-          :on-remove="handleRemove"
+            action="http://the5gofor.oss-cn-guangzhou.aliyuncs.com"
+            :data="avatar"
+            list-type="picture"
+            :limit="1"
+            :on-preview="handlePictureCardPreview"
+            :before-upload="beforePictureUpload"
+            :on-remove="handleRemove"
+            :on-success="handlePictureSuccess"
         >
           <i class="el-icon-plus">上传图片</i>
         </el-upload>
         <el-dialog v-model="dialogVisible">
-          <img width="100%" :src="complainForm.complainPic" alt="" />
+          <img width="100%" :src="complainForm.complainPic" alt=""/>
         </el-dialog>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit" class="sub-btn"
-          >提交反馈</el-button
+        >提交反馈
+        </el-button
         >
       </el-form-item>
     </el-form>
@@ -39,10 +43,12 @@
 </template>
 
 <script>
-import { complain } from "network/user.js";
-import { reactive, ref, toRefs } from "@vue/reactivity";
-import { useStore } from "vuex";
-import { computed } from "@vue/runtime-core";
+import {complain} from "network/user.js";
+import {reactive, ref, toRefs} from "vue";
+import {useStore} from "vuex";
+import {policy} from "network/oss.js"
+
+
 export default {
   name: "Complain",
   setup() {
@@ -54,40 +60,63 @@ export default {
         complainPic: "",
       },
       rules: {
-        type: [{ required: true, message: "类别不能为空", trigger: "blur" }],
+        type: [{required: true, message: "类别不能为空", trigger: "blur"}],
         complainDetails: [
-          {
-            validator: (rule, value, callback) => {
-              if (value !== "") {
-                if (value.length < 10 || value.length > 20) {
-                  callback(new Error("字数不得少于10个字或多于200个字"));
-                }
-              } else callback();
-            },
-          },
+          // {
+          //   validator: (rule, value, callback) => {
+          //     if (value !== "") {
+          //       if (value.length < 10 || value.length > 20) {
+          //         callback(new Error("字数不得少于10个字或多于200个字"));
+          //       }
+          //     } else callback();
+          //   },
+          // },
         ],
       },
+      dialogVisible: false,
     });
     const complainInfo = ref(null);
+    const beforePictureUpload = (file) => {
+      return new Promise((resolve, reject) => {
+        policy().then(response => {
+          state.avatar.policy = response.object.policy;
+          state.avatar.signature = response.object.signature;
+          state.avatar.ossaccessKeyId = response.object.accessKeyId;
+          state.avatar.key = response.object.dir + `${file.name}`;
+          state.avatar.dir = response.object.dir;
+          state.avatar.host = response.object.host;
+          resolve(true)
+        }).catch(err => {
+          console.log(err)
+          reject(false)
+        })
+      })
+    };
+    const handlePictureSuccess = (res, file) => {
+      state.complainForm.complainPic = 'https://the5gofor.oss-cn-guangzhou.aliyuncs.com' + '/' + state.avatar.dir + file.name;
+      state.dialogVisible = true;
+    }
     const onSubmit = () => {
       complainInfo.value.validate((valid) => {
-        if (valid) {
-          complainInfo.value = computed(() => {
-            return {
-              userId: store.state.user.userId,
-              type: state.complainForm.type,
-              complainDetails: state.complainForm.complainDetails,
-              complainPic: state.complainForm.complainPic,
-            };
-          });
-          complain(complainInfo.value);
-        }
-      });
+            console.log("complain")
+            if (valid) {
+              complainInfo.value = {
+                userId: store.state.user.userId,
+                type: state.complainForm.type,
+                complainDetails: state.complainForm.complainDetails,
+                complainPic: state.complainForm.complainPic,
+              }
+            }
+            complain(complainInfo.value);
+          }
+      )
     };
     return {
       ...toRefs(state),
       onSubmit,
       complainInfo,
+      beforePictureUpload,
+      handlePictureSuccess
     };
   },
 };

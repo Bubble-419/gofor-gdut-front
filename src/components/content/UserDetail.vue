@@ -22,7 +22,6 @@
       <table>
         <tr><td><label for="userid">用户 ID:</label><span id="userid">{{ userDetail.userId }}</span></td></tr>
         <tr><td><label for="Stunums">用户学号 :</label><span id="Stunums">{{ userDetail.username }}</span></td></tr>
-        <tr><td><label for="password">账号密码 :</label><span id="password">{{ userDetail.password }}</span></td></tr>
         <tr><td><label for="contact">联系方式:</label><span id="contact">{{ userDetail.userContact }}</span></td></tr>
         <tr><td><label for="address">用户位置:</label><span id="address">{{ userDetail.userPosition }}</span></td></tr>
       </table>

@@ -2,12 +2,12 @@ import {request} from './request';
 
 export function searchbyorderid(orderId){
     return request({
-        url:'/orders/admin/getOrdersById?orderId='+orderId,
+        url:'/admin/getOrdersById?orderId='+orderId,
     })
 }
 export function allorders(currentPage,size=20){
     return request({
-        url:'/orders/admin/allOrders?currentPage='+currentPage+'&size='+size,
+        url:'/admin/allOrders?currentPage='+currentPage+'&size='+size,
     })
 }
 export function dateorders(currentPage,size=20,time){

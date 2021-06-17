@@ -2,8 +2,9 @@
   <div id="detail">
     <my-header></my-header>
     <main>
+      {{ order }}
       <order :order="order"></order>
-      <div class="receiver">
+      <div class="receiver" v-if="order.orderStatus!=0&&order.orderStatus!=4">
         <h4>接单同学</h4>
         <el-card class="small-card">
           <div class="receiver-info">
@@ -20,7 +21,7 @@
             <span v-show="option.id > 0">
               联系方式：{{ receiver.userContact }} </span
             ><span v-show="option.id > 0"
-              >信用：
+          >信用：
               {{ receiver.credit }}
             </span>
           </div>
@@ -30,33 +31,34 @@
         <h4>评价</h4>
         <el-card class="small-card">
           <el-rate
-            v-model="commentContent.commentStars"
-            disabled
-            show-score
+              v-model="commentContent.commentStars"
+              disabled
+              show-score
           ></el-rate>
           <div class="details" v-if="commentContent.commentDetails != ''">
             {{ commentContent.commentDetails }}
           </div>
         </el-card>
       </div>
-      <div class="repay" v-if="repayContent != ''">
+      <div class="repay" v-if="repayContent">
         <h4>回复</h4>
         <el-card class="small-card">
-          {{ repayContent.repayDetails }}
+          {{ repayContent }}
         </el-card>
       </div>
       <el-button
-        type="primary"
-        @click="option.option"
-        :disabled="!option.able"
-        >{{ option.label }}</el-button
+          type="primary"
+          @click="option.option"
+          :disabled="!option.able"
+      >{{ option.label }}
+      </el-button
       >
     </main>
     <el-dialog v-model="commentFormVisible" title="评价">
       <el-form
-        ref="commentInfo"
-        :model="commentForm"
-        :rules="{
+          ref="commentInfo"
+          :model="commentForm"
+          :rules="{
           star: [{ required: true, message: '评分不能为空', trigger: 'blur' }],
         }"
       >
@@ -65,9 +67,10 @@
         </el-form-item>
         <el-form-item prop="commentDetails">
           <el-input
-            type="textarea"
-            :rows="4"
-            placeholder="写下你的评价..."
+              v-model="commentForm.commentDetails"
+              type="textarea"
+              :rows="4"
+              placeholder="写下你的评价..."
           ></el-input>
         </el-form-item>
       </el-form>
@@ -82,15 +85,16 @@
       <el-form :model="repayForm">
         <el-form-item>
           <el-input
-            type="textarea"
-            :rows="4"
-            placeholder="写下你的回复..."
+              type="textarea"
+              :rows="4"
+              placeholder="写下你的回复..."
+              v-model="repayForm.repayDetails"
           ></el-input>
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="commentFormVisible = false">取 消</el-button>
+          <el-button @click="repayFormVisible = false">取 消</el-button>
           <el-button type="primary" @click="onSubmitRep">确 定</el-button>
         </span>
       </template>
@@ -99,12 +103,12 @@
 </template>
 
 <script>
-import { useRoute } from "vue-router";
-import { getDetail } from "network/order.js";
-import { onBeforeMount, onMounted, reactive, toRefs, ref, computed } from "vue";
+import {useRoute} from "vue-router";
+import {getDetail} from "network/order.js";
+import {onMounted, reactive, toRefs, ref} from "vue";
 import MyHeader from "components/content/MyHeader.vue";
 import Order from "components/content/Order";
-import { useStore } from "vuex";
+import {useStore} from "vuex";
 import {
   receiveOrder,
   finishOrder,
@@ -113,14 +117,17 @@ import {
   getComment,
   getRepay,
 } from "network/order.js";
-import { getUserInfoById } from "network/user.js";
-import { useRouter } from "vue-router";
+import {getUserInfoById} from "network/user.js";
+import {useRouter} from "vue-router";
 
 export default {
   name: "Detail",
-  components: { Order, MyHeader },
+  components: {Order, MyHeader},
   setup() {
     const route = useRoute();
+    getDetail({orderId: route.params.orderId}).then((res) => {
+      state.order = res.object;
+    });
     const router = useRouter();
     const store = useStore();
     const state = reactive({
@@ -132,8 +139,9 @@ export default {
           label: "我要接单",
           able: true,
           option: () => {
-            receiveOrder({ userId: store.state.user.userId });
-            router.go(0);
+            console.log("orderId:" + route.params.orderId)
+            receiveOrder({orderId: route.params.orderId, userId: store.state.user.userId}, state.order);
+            router.push({name: "MyReceived"});
           },
         },
         {
@@ -143,7 +151,7 @@ export default {
           option: () => {
             router.push({
               name: "UpdateOrder",
-              params: { orderId: state.order.orderId },
+              params: {orderId: state.order.orderId},
             });
           },
         },
@@ -152,8 +160,9 @@ export default {
           label: "我已完成",
           able: true,
           option: () => {
-            finishOrder({ orderId: state.order.orderId });
-            router.go(0);
+            console.log("id:" + state.order.orderId)
+            finishOrder({orderId: state.order.orderId});
+            router.push({name: "MyReceived"});
           },
         },
         {
@@ -206,14 +215,12 @@ export default {
       state.commentFormVisible = false;
       commentInfo.value.validate((valid) => {
         if (valid) {
-          commentInfo.value = computed(() => {
-            return {
-              orderId: state.order.orderId,
-              commentStars: state.commentInfo.commentStars,
-              commentSDetails: state.commentInfo.commentSDetails,
-              commentPic: "",
-            };
-          });
+          commentInfo.value = {
+            orderId: state.order.orderId,
+            commentStars: state.commentForm.commentStars,
+            commentDetails: state.commentForm.commentDetails,
+            commentPic: "",
+          };
           commentOrder(commentInfo.value);
         }
       });
@@ -225,48 +232,38 @@ export default {
         replayDetails: state.repayForm.repayDetails,
       });
     };
-    onBeforeMount(() => {
-      getDetail({ orderId: route.params.orderId }).then((res) => {
-        state.order = res.object;
-      });
-    });
     onMounted(() => {
       let optionId = 0;
       if (
-        state.order.orderStatus == 0 &&
-        store.state.user.userId != state.order.publisherId
+          state.order.orderStatus == 0 &&
+          store.state.user.userId != state.order.publisherId
       ) {
         optionId = 0;
-      }
-      if (
-        state.order.orderStatus == 0 &&
-        store.state.user.userId == state.order.publisherId
+      } else if (
+          state.order.orderStatus == 0 &&
+          store.state.user.userId == state.order.publisherId
       ) {
         optionId = 1;
-      }
-      if (
-        state.order.orderStatus == 1 &&
-        store.state.user.userId == state.order.receiverId
+      } else if (
+          state.order.orderStatus == 1 &&
+          store.state.user.userId == state.order.receiverId
       ) {
         optionId = 2;
-      }
-      if (
-        state.order.orderStatus == 1 &&
-        store.state.user.userId == state.order.publisherId
+      } else if (
+          state.order.orderStatus == 1 &&
+          store.state.user.userId == state.order.publisherId
       ) {
         optionId = 3;
-      }
-      if (
-        state.order.orderStatus == 2 &&
-        (store.state.user.userId == state.order.publisherId ||
-          store.state.user.userId == state.order.receiverId)
+      } else if (
+          state.order.orderStatus == 2 &&
+          (store.state.user.userId == state.order.publisherId ||
+              store.state.user.userId == state.order.receiverId)
       ) {
         optionId = 4;
-      }
-      if (
-        state.order.orderStatus == 3 &&
-        (store.state.user.userId == state.order.publisherId ||
-          store.state.user.userId == state.order.receiverId)
+      } else if (
+          state.order.orderStatus == 3 &&
+          (store.state.user.userId == state.order.publisherId ||
+              store.state.user.userId == state.order.receiverId)
       ) {
         optionId = 5;
       } else if (state.order.orderStatus >= 2 && state.order.orderStatus < 4) {
@@ -275,17 +272,26 @@ export default {
         optionId = 7;
       }
       state.option = state.options.find((o) => o.id == optionId);
-      getUserInfoById({ userId: state.order.receiverId }).then((res) => {
-        state.receiver = res.object;
-      });
-      getComment({ orderId: state.order.orderId }).then((res) => {
-        state.commentContent = res.object;
-      });
-      if (state.commentContent != "") {
-        getRepay({ commentId: state.commentContent.commentId }).then((res) => {
-          state.repayContent = res.object;
+      if (state.order.orderStatus >= 1 && state.order.orderStatus != 4) {
+        getUserInfoById({userId: state.order.receiverId}).then((res) => {
+          state.receiver = res.object;
         });
       }
+      (async () => {
+        if (state.order.orderStatus == 3) {
+          await getComment({orderId: state.order.orderId}).then((res) => {
+            state.commentContent = res.object;
+          });
+        }
+        if (state.commentContent.commentId) {
+          console.log("res2:" + state.commentContent.commentId);
+          await getRepay({commentId: state.commentContent.commentId}).then((res) => {
+            state.repayContent = res.object.replayDetails;
+          });
+        }
+      })();
+
+
     });
     return {
       ...toRefs(state),
@@ -302,6 +308,7 @@ export default {
   padding: 80px 0;
   margin-bottom: 50px;
 }
+
 .receiver,
 .comment,
 .repay {

@@ -3,11 +3,12 @@
     <my-header></my-header>
     <main>
       <order-page
-        :order-list="results"
-        :total="total"
-        :current-page="currentPage"
-        :page-size="pageSize"
-        @change-page="changePage"
+          :height="2200"
+          :order-list="results"
+          :total="total"
+          :current-page="currentPage"
+          :page-size="pageSize"
+          @change-page="changePage"
       ></order-page>
     </main>
     <my-footer></my-footer>
@@ -18,9 +19,10 @@
 import MyHeader from "components/content/MyHeader";
 import MyFooter from "components/content/MyFooter";
 import OrderPage from "components/content/OrderPage";
-import { onBeforeMount, reactive, toRefs } from "vue";
-import { useRoute } from "vue-router";
-import { searchByKeywords } from "network/header.js";
+import {onBeforeMount, reactive, toRefs} from "vue";
+import {useRoute} from "vue-router";
+import {searchByKeywords} from "network/header.js";
+
 export default {
   name: "SearchResult",
   components: {
@@ -37,11 +39,13 @@ export default {
       total: 0,
     });
     const getResults = () => {
+      console.log("get results");
       searchByKeywords({
         currentPage: state.currentPage,
         size: state.pageSize,
         con: route.params.keywords,
       }).then((res) => {
+        console.log(res);
         state.results = res.object.records;
         state.total = res.object.total;
         state.pageSize = res.object.size;
@@ -64,4 +68,7 @@ export default {
 </script>
 
 <style scoped>
+main {
+  margin-top: 50px;
+}
 </style>
