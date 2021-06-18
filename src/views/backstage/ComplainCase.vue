@@ -1,13 +1,4 @@
 <template>
-  <div class="selectdate">
-    <el-date-picker
-        v-model="month"
-        type="month"
-        :disabled-date="disabledDate"
-        size="medium"
-        placeholder="选择月">
-    </el-date-picker>
-  </div>
   <el-table
       :data="cases.filter(data => !search || data.name.toLowerCase().includes(search.toLowerCase()))"
       style="width: 100%" class="tablebox">
@@ -19,6 +10,19 @@
         sortable
         :formatter="dateFormat"
     >
+      <template #header>
+        <div class="selectdate">
+          <el-date-picker
+              v-model="month"
+              type="month"
+              :disabled-date="disabledDate"
+              size="medium"
+              placeholder="选择月"
+              style="width: 15vh"
+          >
+          </el-date-picker>
+        </div>
+      </template>
     </el-table-column>
     <el-table-column
         prop="type"

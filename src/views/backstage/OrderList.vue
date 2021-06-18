@@ -1,21 +1,24 @@
 <template>
-  <search-box style="padding-bottom: 40px" @search="searchId"></search-box>
-  <div style="text-align: left;margin: 10px">
-    <el-button @click="resetDateFilter">清除日期过滤器</el-button>
-    <el-button @click="clearFilter">清除所有过滤器</el-button>
-    <div class="selectdate" style="float: right">
+  <search-box id="sear" @search="searchId"></search-box>
+  <div class="con" id="tz">
+    <div>
+      <el-button @click="resetDateFilter">清除日期过滤器</el-button>
+      <el-button @click="clearFilter">清除类型过滤器</el-button>
+    </div>
+    <div class="selectdate">
       <el-date-picker
           v-model="month"
           type="month"
           :disabled-date="disabledDate"
-          size="medium"
+          size="large"
+          style="width: 140px;margin-right: 5px"
           placeholder="选择月">
       </el-date-picker>
       <el-date-picker
           v-model="day"
-          align="right"
           type="date"
-          size="medium"
+          size="large"
+          style="width: 140px;margin-left: 5px"
           placeholder="选择日期"
           :disabled-date="disabledDate"
           :shortcuts="shortcuts"
@@ -23,111 +26,111 @@
       </el-date-picker>
     </div>
   </div>
-  <el-table
-      :data="orderlist"
-      ref="filterTable"
-      style="width: 100%">
-    <el-table-column type="expand">
-      <template #default="props">
-        <el-form label-position="left" inline class="demo-table-expand">
-          <el-form-item label="订单编号">
-            <span>{{ props.row.orderId }}</span>
-          </el-form-item>
-          <el-form-item label="下单人 ID">
-            <span>{{ props.row.publisherId }}</span>
-          </el-form-item>
-          <el-form-item label="联系方式">
-            <span>{{ props.row.publisherContact }}</span>
-          </el-form-item>
-          <el-form-item label="创建时间" :formatter="dateFormat">
-            <span>{{ moment(props.row.createTime).format("YYYY-MM-DD HH:mm:ss") }}</span>
-          </el-form-item>
-          <el-form-item label="接单人 ID">
-            <span>{{ props.row.receiverId }}</span>
-          </el-form-item>
-          <el-form-item label="联系方式">
-            <span>{{ props.row.receiverContact }}</span>
-          </el-form-item>
-          <el-form-item label="订单价格">
-            <span>{{ props.row.price }}</span>
-          </el-form-item>
-          <el-form-item label="接收时间">
-            <span>{{ moment(props.row.receiveTime).format("YYYY-MM-DD HH:mm:ss") }}</span>
-          </el-form-item>
-          <el-form-item label="完成时间" :formatter="dateFormat">
-            <span>{{ moment(props.row.finishedTIme).format("YYYY-MM-DD HH:mm:ss") }}</span>
-          </el-form-item>
-          <el-form-item label="取货地址">
-            <span>{{ props.row.takeAddress }}</span>
-          </el-form-item>
-          <el-form-item label="收货地址">
-            <span>{{ props.row.sendAddress }}</span>
-          </el-form-item>
-          <el-form-item label="订单备注">
-            <span>{{ props.row.orderNote }}</span>
-          </el-form-item>
-        </el-form>
-      </template>
-    </el-table-column>
-    <el-table-column
-        prop="createTime"
-        label="日期"
-        sortable
-        width="180"
-        column-key="date"
-        :formatter="dateFormat"
-    >
-    </el-table-column>
-    <el-table-column
-        prop="orderCategoryId"
-        label="订单类型"
-        width="100"
-        :filters="[
+    <el-table
+        :data="orderlist"
+        ref="filterTable"
+        style="width: 100%">
+      <el-table-column type="expand">
+        <template #default="props">
+          <el-form label-position="left" inline class="demo-table-expand">
+            <el-form-item label="订单编号">
+              <span>{{ props.row.orderId }}</span>
+            </el-form-item>
+            <el-form-item label="下单人 ID">
+              <span>{{ props.row.publisherId }}</span>
+            </el-form-item>
+            <el-form-item label="联系方式">
+              <span>{{ props.row.publisherContact }}</span>
+            </el-form-item>
+            <el-form-item label="创建时间" :formatter="dateFormat">
+              <span>{{ moment(props.row.createTime).format("YYYY-MM-DD HH:mm:ss") }}</span>
+            </el-form-item>
+            <el-form-item label="接单人 ID">
+              <span>{{ props.row.receiverId }}</span>
+            </el-form-item>
+            <el-form-item label="联系方式">
+              <span>{{ props.row.receiverContact }}</span>
+            </el-form-item>
+            <el-form-item label="订单价格">
+              <span>{{ props.row.price }}</span>
+            </el-form-item>
+            <el-form-item label="接收时间">
+              <span>{{ moment(props.row.receiveTime).format("YYYY-MM-DD HH:mm:ss") }}</span>
+            </el-form-item>
+            <el-form-item label="完成时间" :formatter="dateFormat">
+              <span>{{ moment(props.row.finishedTIme).format("YYYY-MM-DD HH:mm:ss") }}</span>
+            </el-form-item>
+            <el-form-item label="取货地址">
+              <span>{{ props.row.takeAddress }}</span>
+            </el-form-item>
+            <el-form-item label="收货地址">
+              <span>{{ props.row.sendAddress }}</span>
+            </el-form-item>
+            <el-form-item label="订单备注">
+              <span>{{ props.row.orderNote }}</span>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
+      <el-table-column
+          prop="createTime"
+          label="日期"
+          sortable
+          width="180"
+          column-key="date"
+          :formatter="dateFormat"
+      >
+      </el-table-column>
+      <el-table-column
+          prop="orderCategoryId"
+          label="订单类型"
+          width="100"
+          :filters="[
             { text: '外卖', value: 1 },
             { text: '快递', value: 2 },
             { text: '打包', value: 3 },
             { text: '打印', value: 4 },
             { text: '帮带', value: 5 },
             { text: '其他', value: 6 }]"
-        :filter-method="filterTag"
-        filter-placement="bottom-end">
-      <template #default="scope">
-        <el-tag
-            :type="typeColor(scope.row.orderCategoryId)"
-            disable-transitions>{{type(scope.row.orderCategoryId)}}</el-tag>
-      </template>
-    </el-table-column>
-    <el-table-column
-        width="200"
-        label="订单 ID"
-        prop="orderId">
-    </el-table-column>
-    <el-table-column
-        :show-overflow-tooltip="true"
-        label="订单描述"
-        prop="orderNote">
-    </el-table-column>
-    <el-table-column
-        label="下单人 ID"
-        prop="publisherId">
-    </el-table-column>
-    <el-table-column
-        label="接单人 ID"
-        prop="receiverId">
-    </el-table-column>
-    <el-table-column
-        label="订单价格"
-        prop="price">
-    </el-table-column>
-    <el-table-column
-        label="订单状态"
-        prop="orderStatus">
-      <template v-slot="scope">
-        <span>{{Status(scope.row.orderStatus)}}</span>
-      </template>
-    </el-table-column>
-  </el-table>
-  <PaginationBox :totalpage="totalpage" @page="changepage" @size="changesize"></PaginationBox>
+          :filter-method="filterTag"
+          filter-placement="bottom-end">
+        <template #default="scope">
+          <el-tag
+              :type="typeColor(scope.row.orderCategoryId)"
+              disable-transitions>{{type(scope.row.orderCategoryId)}}</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column
+          width="200"
+          label="订单 ID"
+          prop="orderId">
+      </el-table-column>
+      <el-table-column
+          :show-overflow-tooltip="true"
+          label="订单描述"
+          prop="orderNote">
+      </el-table-column>
+      <el-table-column
+          label="下单人 ID"
+          prop="publisherId">
+      </el-table-column>
+      <el-table-column
+          label="接单人 ID"
+          prop="receiverId">
+      </el-table-column>
+      <el-table-column
+          label="订单价格"
+          prop="price">
+      </el-table-column>
+      <el-table-column
+          label="订单状态"
+          prop="orderStatus">
+        <template v-slot="scope">
+          <span>{{Status(scope.row.orderStatus)}}</span>
+        </template>
+      </el-table-column>
+    </el-table>
+    <PaginationBox :totalpage="totalpage" @page="changepage" @size="changesize"></PaginationBox>
 </template>
 
 <script>
@@ -137,6 +140,7 @@ import { ref, onMounted, watch} from 'vue';
 import { allorders ,dateorders ,searchbyorderid  } from 'network/Orderlist.js';
 import {ElMessage} from "element-plus";
 import moment from "moment";
+import useMove from "utils/UserMove.js";
 export default {
   name: "OrderList",
   components:{
@@ -167,6 +171,8 @@ export default {
     onMounted(()=>{
       screen.value ='no';
       allOrders(1,20);
+      const el = document.getElementById("tz");
+      useMove(el);
     })
     watch(month,()=>{
       screen.value ='month';
@@ -337,6 +343,17 @@ export default {
 </script>
 
 <style>
+.con{
+  position: fixed;
+  z-index: 5;
+  width: 290px;
+  height: 110px;
+  border-radius: 5px;
+  background-color: #FFFFFF;
+}
+#sear{
+  margin-bottom: 20px;
+}
 .demo-table-expand {
   font-size: 0;
 }

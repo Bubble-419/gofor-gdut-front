@@ -51,5 +51,6 @@ export default {
 <style scoped>
 .el-pagination{
   padding: 20px;
+  background-color: #FFFFFF;
 }
 </style>

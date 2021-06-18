@@ -5,6 +5,7 @@
 <script>
 import { ref, onMounted, toRefs, watch } from "vue";
 import * as echarts from "echarts";
+import ChartTheme from '@/assets/theme/ChartTheme'
 export default {
   name: "Echarts",
   props:{
@@ -21,7 +22,7 @@ export default {
     const chart = ref(null);
     const { options } = toRefs(props);
     onMounted(() => {
-      chart.value = echarts.init(container.value,"chart-theme");
+      chart.value = echarts.init(container.value,ChartTheme);
       chart.value.setOption(props.options);
     });
     watch(

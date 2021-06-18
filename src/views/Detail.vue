@@ -2,7 +2,6 @@
   <div id="detail">
     <my-header></my-header>
     <main>
-      {{ order }}
       <order :order="order"></order>
       <div class="receiver" v-if="order.orderStatus!=0&&order.orderStatus!=4">
         <h4>接单同学</h4>
@@ -271,6 +270,7 @@ export default {
       } else {
         optionId = 7;
       }
+      console.log('optionId:'+optionId);
       state.option = state.options.find((o) => o.id == optionId);
       if (state.order.orderStatus >= 1 && state.order.orderStatus != 4) {
         getUserInfoById({userId: state.order.receiverId}).then((res) => {

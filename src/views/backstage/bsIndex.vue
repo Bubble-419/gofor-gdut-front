@@ -63,7 +63,7 @@
           </div>
         </el-header>
         <el-main>
-          <div id="showcontainer" style="background-color: #ffffff">
+          <div id="showcontainer">
             <router-view></router-view>
           </div>
           <div class="footer">

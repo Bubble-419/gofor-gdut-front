@@ -6,7 +6,6 @@ import router from './router'
 import store from './store'
 import installElementPlus from './plugins/element'
 import * as echarts from 'echarts'
-import 'echarts/theme/chart-theme'
 
 import 'assets/css/theme/index.css'
 import "assets/css/base.css"

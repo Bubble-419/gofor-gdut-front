@@ -1,5 +1,5 @@
 <template>
-  <search-box style="padding-bottom: 40px" @search="searchID"></search-box>
+  <search-box style="padding-bottom: 40px;" @search="searchID"></search-box>
     <UserDetail v-show="show" :userDetail="userDetail" @close="closewindow()"></UserDetail>
   <el-table
       :data="userslist"

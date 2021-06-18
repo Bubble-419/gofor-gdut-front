@@ -3,7 +3,7 @@
     <my-header></my-header>
     <main>
       <order-page
-          :height="2200"
+          :height="600"
           :order-list="results"
           :total="total"
           :current-page="currentPage"
@@ -45,7 +45,6 @@ export default {
         size: state.pageSize,
         con: route.params.keywords,
       }).then((res) => {
-        console.log(res);
         state.results = res.object.records;
         state.total = res.object.total;
         state.pageSize = res.object.size;
