@@ -8,9 +8,10 @@
 
 <script>
 import OrderList from "components/content/OrderList";
-import { onMounted, reactive, toRefs } from "vue";
-import { useStore } from "vuex";
-import { getHistory } from "network/order.js";
+import {reactive, toRefs} from "vue";
+import {useStore} from "vuex";
+import {getHistory} from "network/order.js";
+
 export default {
   name: "MyHistory",
   components: {
@@ -18,6 +19,11 @@ export default {
   },
   setup() {
     const store = useStore();
+    getHistory({
+      username: store.state.user.username,
+    }).then((res) => {
+      state.orderList = res.object;
+    });
     const state = reactive({
       orderList: [],
       total: 0,
@@ -25,13 +31,8 @@ export default {
       pageSize: 8,
     });
     // 获取订单列表
-    onMounted(() => {
-      getHistory({
-        username: store.state.user.username,
-      }).then((res) => {
-        state.orderList = res.object;
-      });
-    });
+    // onBeforeMount(() => {
+    // });
     return {
       ...toRefs(state),
     };

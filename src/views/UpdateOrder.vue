@@ -1,6 +1,7 @@
 <template>
   <div id="update-order">
     <my-header></my-header>
+    {{orderForm}}
     <el-form
         :model="orderForm"
         ref="orderInfo"
@@ -87,28 +88,30 @@ export default {
           {required: true, message: "送货地址不能为空", trigger: "blur"},
         ],
         price: [
-          {required: true, message: "价格不能为空", trigger: "blur"},
-          {type: "number", message: "请输入正确的数字"},
-          {min: 0, message: "价格不能低于0元", trigger: "blur"},
+          {required: true, message: "价格不能为空"},
+          {type: 'number', message: "请输入正确的数字"},
+          {
+            validator: (rules, value, callback) => {
+              if (value <= 0) {
+                return callback(new Error("价格不能低于0元"));
+              } else callback();
+            }
+          }
         ],
       },
     });
-    console.log("route.params.orderId:" + route.params.orderId);
-    getDetail(route.params.orderId).then((res) => {
-      console.log("res.object:" + res.object)
+    getDetail({orderId: route.params.orderId}).then((res) => {
       state.orderForm = res.object;
-      console.log("state.orderForm:" + state.orderForm)
     });
     const orderInfo = ref(null);
     const onUpdate = () => {
       orderInfo.value.validate((valid) => {
         if (valid) {
           orderInfo.value = state.orderForm;
-          updateOrder(orderInfo.value).then((res) => {
-            if (res.status == "200") {
-              setTimeout(() => {
-                router.push({name: "Home"});
-              }, 1000);
+          console.log(orderInfo.value.orderId)
+          updateOrder({orders: orderInfo.value}).then((res) => {
+            if (res.code == 200) {
+              router.push({name: "Home"});
             }
           });
         }

@@ -18,7 +18,7 @@
       <el-form-item class="pic-upload">
         <el-upload
             action="http://the5gofor.oss-cn-guangzhou.aliyuncs.com"
-            :data="avatar"
+            :data="pic"
             list-type="picture"
             :limit="1"
             :on-preview="handlePictureCardPreview"
@@ -59,6 +59,14 @@ export default {
         complainDetails: "",
         complainPic: "",
       },
+      pic: {
+        policy: '',
+        signature: '',
+        key: '',
+        ossaccessKeyId: '',
+        dir: '',
+        host: '',
+      },
       rules: {
         type: [{required: true, message: "类别不能为空", trigger: "blur"}],
         complainDetails: [
@@ -79,12 +87,12 @@ export default {
     const beforePictureUpload = (file) => {
       return new Promise((resolve, reject) => {
         policy().then(response => {
-          state.avatar.policy = response.object.policy;
-          state.avatar.signature = response.object.signature;
-          state.avatar.ossaccessKeyId = response.object.accessKeyId;
-          state.avatar.key = response.object.dir + `${file.name}`;
-          state.avatar.dir = response.object.dir;
-          state.avatar.host = response.object.host;
+          state.pic.policy = response.object.policy;
+          state.pic.signature = response.object.signature;
+          state.pic.ossaccessKeyId = response.object.accessKeyId;
+          state.pic.key = response.object.dir + `${file.name}`;
+          state.pic.dir = response.object.dir;
+          state.pic.host = response.object.host;
           resolve(true)
         }).catch(err => {
           console.log(err)
@@ -93,12 +101,12 @@ export default {
       })
     };
     const handlePictureSuccess = (res, file) => {
-      state.complainForm.complainPic = 'https://the5gofor.oss-cn-guangzhou.aliyuncs.com' + '/' + state.avatar.dir + file.name;
+      state.complainForm.complainPic = 'https://the5gofor.oss-cn-guangzhou.aliyuncs.com' + '/' + state.pic.dir + file.name;
       state.dialogVisible = true;
     }
     const onSubmit = () => {
       complainInfo.value.validate((valid) => {
-            console.log("complain")
+            console.log("state.complainForm.complainPic:" + state.complainForm.complainPic)
             if (valid) {
               complainInfo.value = {
                 userId: store.state.user.userId,

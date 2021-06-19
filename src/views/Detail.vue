@@ -270,29 +270,25 @@ export default {
       } else {
         optionId = 7;
       }
-      console.log('optionId:'+optionId);
       state.option = state.options.find((o) => o.id == optionId);
       if (state.order.orderStatus >= 1 && state.order.orderStatus != 4) {
         getUserInfoById({userId: state.order.receiverId}).then((res) => {
           state.receiver = res.object;
         });
       }
-      (async () => {
-        if (state.order.orderStatus == 3) {
-          await getComment({orderId: state.order.orderId}).then((res) => {
-            state.commentContent = res.object;
-          });
-        }
-        if (state.commentContent.commentId) {
-          console.log("res2:" + state.commentContent.commentId);
-          await getRepay({commentId: state.commentContent.commentId}).then((res) => {
-            state.repayContent = res.object.replayDetails;
-          });
-        }
-      })();
+      if (state.order.orderStatus == 3) {
+        getComment({orderId: state.order.orderId}).then((res) => {
+          state.commentContent = res.object;
+        }).then(() => {
+          if (state.commentContent.commentId) {
+            getRepay({commentId: state.commentContent.commentId}).then((res) => {
+              state.repayContent = res.object.replayDetails;
+            });
+          }
+        })
+      }
+    })
 
-
-    });
     return {
       ...toRefs(state),
       onSubmitCom,

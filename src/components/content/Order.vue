@@ -50,13 +50,10 @@ export default {
     },
   },
   setup(props) {
-    console.log('props.order.publisherId:' + props.order.publisherId)
     getUserInfoById({userId: props.order.publisherId}).then((res) => {
-      console.log('res.object.username' + res.object.username)
       state.publisher.publisherName = res.object.name;
       state.publisher.publisherIcon = res.object.userIcon;
       state.publisher.publisherContact = res.object.userContact;
-      console.log('state.publisher.publisherName' + state.publisher.publisherName);
     });
     const store = useStore();
     const state = reactive({
