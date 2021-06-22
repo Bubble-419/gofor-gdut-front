@@ -80,6 +80,7 @@ export default {
     });
     const regInfo = ref(null);
 
+    // 监听学号的输入判断性别
     watch(
       () => state.regForm.username,
       (username) => {
@@ -102,9 +103,11 @@ export default {
       }
     };
 
+    // 注册按钮绑定事件
     const onSubmit = () => {
       regInfo.value.validate((valid) => {
         if (valid) {
+          // 注册信息封装
           regInfo.value = {
             username: state.regForm.username,
             password: state.regForm.password,

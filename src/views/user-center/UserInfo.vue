@@ -69,6 +69,8 @@ export default {
         host: '',
       }
     });
+
+    // 上传头像前生成oss对象
     const beforeAvatarUpload = (file) => {
       return new Promise((resolve, reject) => {
         policy().then(response => {
@@ -86,9 +88,12 @@ export default {
         })
       })
     };
+    // 获取头像src
     const handleAvatarSuccess = (res, file) => {
       state.user.userIcon = 'https://the5gofor.oss-cn-guangzhou.aliyuncs.com' + '/' + state.avatar.dir + file.name;
     };
+    
+    // 提示用户
     onBeforeRouteLeave((to, from, next) => {
       // 信息已修改但未提交
       if (state.isDisabled == false) {
@@ -105,13 +110,14 @@ export default {
               next();
             })
             .catch(() => {
-              console.log(to.path, from.path);
               next(from.path);
             });
       } else next();
     });
     const onUpdate = () => {
+      // 后端修改
       updateUserInfo(state.user);
+      // 前端修改
       window.localStorage.setItem("user", JSON.stringify(state.user))
       store.commit("setUser", {
         user: state.user,
@@ -120,9 +126,11 @@ export default {
       window.location.reload();
     };
     (async () => {
+      // 展示用户信息
       await getUserInfo().then((res) => {
         state.user = res;
       });
+      // 深度监听user对象是否发生改变，只有改变时修改按钮才会亮起（允许提交修改）
       watch(
           () => [state.user],
           () => {

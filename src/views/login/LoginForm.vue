@@ -58,6 +58,7 @@ export default {
     });
     const loginInfo = ref(null);
 
+    // 登录按钮绑定事件
     const onSubmit = () => {
       loginInfo.value.validate((valid) => {
         if (valid) {
@@ -65,17 +66,23 @@ export default {
             loginInfo.value = state.loginForm;
             await login(loginInfo.value).then(res => {
               if (res.code == 200) {
+                // 储存用户token
                 window.localStorage.setItem("token", res.object.token);
+                // vuex储存用户登陆状态
                 store.commit("setIsLogin", true);
               }
             });
+            // 储存序列化后的用户对象
             await getUserInfo().then(res => {
+              // 储存在localStorage，防止刷新后vuex里的信息丢失
               window.localStorage.setItem("user", JSON.stringify(res))
+              // 储存在vuex，方便程序内部取用
               store.commit("setUser", {
                 user: window.localStorage.getItem('user'),
               });
             });
           })();
+          // 返回用户登陆前的浏览界面
           router.go(-1);
         } else return false;
       });

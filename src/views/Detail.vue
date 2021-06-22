@@ -2,8 +2,10 @@
   <div id="detail">
     <my-header></my-header>
     <main>
+      <!-- 订单信息 -->
       <order :order="order"></order>
-      <div class="receiver" v-if="order.orderStatus!=0&&order.orderStatus!=4">
+      <!-- 接单人信息 -->
+      <div class="receiver" v-if="option.id > 1 && option.id < 7">
         <h4>接单同学</h4>
         <el-card class="small-card">
           <div class="receiver-info">
@@ -20,44 +22,44 @@
             <span v-show="option.id > 0">
               联系方式：{{ receiver.userContact }} </span
             ><span v-show="option.id > 0"
-          >信用：
+              >信用：
               {{ receiver.credit }}
             </span>
           </div>
         </el-card>
       </div>
+      <!-- 评价信息 -->
       <div class="comment" v-if="commentContent != ''">
         <h4>评价</h4>
         <el-card class="small-card">
           <el-rate
-              v-model="commentContent.commentStars"
-              disabled
-              show-score
+            v-model="commentContent.commentStars"
+            disabled
+            show-score
           ></el-rate>
           <div class="details" v-if="commentContent.commentDetails != ''">
             {{ commentContent.commentDetails }}
           </div>
         </el-card>
       </div>
+      <!-- 回复信息 -->
       <div class="repay" v-if="repayContent">
         <h4>回复</h4>
         <el-card class="small-card">
           {{ repayContent }}
         </el-card>
       </div>
-      <el-button
-          type="primary"
-          @click="option.option"
-          :disabled="!option.able"
-      >{{ option.label }}
-      </el-button
-      >
+      <!-- 操作按钮 -->
+      <el-button type="primary" @click="option.option" :disabled="!option.able"
+        >{{ option.label }}
+      </el-button>
     </main>
+    <!-- 评价动态框 -->
     <el-dialog v-model="commentFormVisible" title="评价">
       <el-form
-          ref="commentInfo"
-          :model="commentForm"
-          :rules="{
+        ref="commentInfo"
+        :model="commentForm"
+        :rules="{
           star: [{ required: true, message: '评分不能为空', trigger: 'blur' }],
         }"
       >
@@ -66,10 +68,10 @@
         </el-form-item>
         <el-form-item prop="commentDetails">
           <el-input
-              v-model="commentForm.commentDetails"
-              type="textarea"
-              :rows="4"
-              placeholder="写下你的评价..."
+            v-model="commentForm.commentDetails"
+            type="textarea"
+            :rows="4"
+            placeholder="写下你的评价..."
           ></el-input>
         </el-form-item>
       </el-form>
@@ -80,14 +82,15 @@
         </span>
       </template>
     </el-dialog>
+    <!-- 回复评价动态框 -->
     <el-dialog v-model="repayFormVisible" title="回复评价">
       <el-form :model="repayForm">
         <el-form-item>
           <el-input
-              type="textarea"
-              :rows="4"
-              placeholder="写下你的回复..."
-              v-model="repayForm.repayDetails"
+            type="textarea"
+            :rows="4"
+            placeholder="写下你的回复..."
+            v-model="repayForm.repayDetails"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -102,12 +105,12 @@
 </template>
 
 <script>
-import {useRoute} from "vue-router";
-import {getDetail} from "network/order.js";
-import {onMounted, reactive, toRefs, ref} from "vue";
+import { useRoute } from "vue-router";
+import { getDetail } from "network/order.js";
+import { onMounted, reactive, toRefs, ref } from "vue";
 import MyHeader from "components/content/MyHeader.vue";
 import Order from "components/content/Order";
-import {useStore} from "vuex";
+import { useStore } from "vuex";
 import {
   receiveOrder,
   finishOrder,
@@ -116,15 +119,15 @@ import {
   getComment,
   getRepay,
 } from "network/order.js";
-import {getUserInfoById} from "network/user.js";
-import {useRouter} from "vue-router";
+import { getUserInfoById } from "network/user.js";
+import { useRouter } from "vue-router";
 
 export default {
   name: "Detail",
-  components: {Order, MyHeader},
+  components: { Order, MyHeader },
   setup() {
     const route = useRoute();
-    getDetail({orderId: route.params.orderId}).then((res) => {
+    getDetail({ orderId: route.params.orderId }).then((res) => {
       state.order = res.object;
     });
     const router = useRouter();
@@ -138,9 +141,14 @@ export default {
           label: "我要接单",
           able: true,
           option: () => {
-            console.log("orderId:" + route.params.orderId)
-            receiveOrder({orderId: route.params.orderId, userId: store.state.user.userId}, state.order);
-            router.push({name: "MyReceived"});
+            receiveOrder(
+              {
+                orderId: route.params.orderId,
+                userId: store.state.user.userId,
+              },
+              state.order
+            );
+            router.push({ name: "MyReceived" });
           },
         },
         {
@@ -150,7 +158,7 @@ export default {
           option: () => {
             router.push({
               name: "UpdateOrder",
-              params: {orderId: state.order.orderId},
+              params: { orderId: state.order.orderId },
             });
           },
         },
@@ -159,9 +167,8 @@ export default {
           label: "我已完成",
           able: true,
           option: () => {
-            console.log("id:" + state.order.orderId)
-            finishOrder({orderId: state.order.orderId});
-            router.push({name: "MyReceived"});
+            finishOrder({ orderId: state.order.orderId });
+            router.push({ name: "MyReceived" });
           },
         },
         {
@@ -232,62 +239,79 @@ export default {
       });
     };
     onMounted(() => {
+      // 判断optionId
       let optionId = 0;
       if (
-          state.order.orderStatus == 0 &&
-          store.state.user.userId != state.order.publisherId
+        // 订单是未接单状态且当前用户不是发单人
+        state.order.orderStatus == 0 &&
+        store.state.user.userId != state.order.publisherId
       ) {
         optionId = 0;
       } else if (
-          state.order.orderStatus == 0 &&
-          store.state.user.userId == state.order.publisherId
+        // 订单是未接单状态且当前用户是发单人
+        state.order.orderStatus == 0 &&
+        store.state.user.userId == state.order.publisherId
       ) {
         optionId = 1;
       } else if (
-          state.order.orderStatus == 1 &&
-          store.state.user.userId == state.order.receiverId
+        // 订单是已接单状态且当前用户是接单人
+        state.order.orderStatus == 1 &&
+        store.state.user.userId == state.order.receiverId
       ) {
         optionId = 2;
       } else if (
-          state.order.orderStatus == 1 &&
-          store.state.user.userId == state.order.publisherId
+        // 订单是已接单状态且当前用户是发单人
+        state.order.orderStatus == 1 &&
+        store.state.user.userId == state.order.publisherId
       ) {
         optionId = 3;
       } else if (
-          state.order.orderStatus == 2 &&
-          (store.state.user.userId == state.order.publisherId ||
-              store.state.user.userId == state.order.receiverId)
+        // 订单是已完成状态且当前用户是发单人或接单人
+        state.order.orderStatus == 2 &&
+        (store.state.user.userId == state.order.publisherId ||
+          store.state.user.userId == state.order.receiverId)
       ) {
         optionId = 4;
       } else if (
-          state.order.orderStatus == 3 &&
-          (store.state.user.userId == state.order.publisherId ||
-              store.state.user.userId == state.order.receiverId)
+        // 订单是已评价状态且当前用户是发单人或接单人
+        state.order.orderStatus == 3 &&
+        (store.state.user.userId == state.order.publisherId ||
+          store.state.user.userId == state.order.receiverId)
       ) {
         optionId = 5;
-      } else if (state.order.orderStatus >= 2 && state.order.orderStatus < 4) {
+      }
+      // 订单是已完成状态
+      else if (state.order.orderStatus >= 2 && state.order.orderStatus < 4) {
         optionId = 6;
       } else {
+        // 订单无效
         optionId = 7;
       }
+      // 把筛选出来的option赋给按钮绑定的option变量
       state.option = state.options.find((o) => o.id == optionId);
       if (state.order.orderStatus >= 1 && state.order.orderStatus != 4) {
-        getUserInfoById({userId: state.order.receiverId}).then((res) => {
+        getUserInfoById({ userId: state.order.receiverId }).then((res) => {
           state.receiver = res.object;
         });
       }
+      // 判断是否应该展示评论和回复信息
       if (state.order.orderStatus == 3) {
-        getComment({orderId: state.order.orderId}).then((res) => {
-          state.commentContent = res.object;
-        }).then(() => {
-          if (state.commentContent.commentId) {
-            getRepay({commentId: state.commentContent.commentId}).then((res) => {
-              state.repayContent = res.object.replayDetails;
-            });
-          }
-        })
+        getComment({ orderId: state.order.orderId })
+          .then((res) => {
+            state.commentContent = res.object;
+          })
+          .then(() => {
+            // 判断comment是否存在
+            if (state.commentContent.commentId) {
+              getRepay({ commentId: state.commentContent.commentId }).then(
+                (res) => {
+                  state.repayContent = res.object.replayDetails;
+                }
+              );
+            }
+          });
       }
-    })
+    });
 
     return {
       ...toRefs(state),

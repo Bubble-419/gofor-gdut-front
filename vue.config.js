@@ -18,6 +18,7 @@ proxyObj['/'] = {
 module.exports = {
   configureWebpack: {
     resolve: {
+      // 文件夹别名
       alias: {
         'assets': '@/assets',
         'components': '@/components',

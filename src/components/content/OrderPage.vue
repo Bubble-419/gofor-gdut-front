@@ -1,6 +1,6 @@
 <template>
   <el-scrollbar :height="height">
-    <order-list :orderList="orderList"></order-list>
+    <order-list :order-list="orderList"></order-list>
     <div class="pagination">
       <el-pagination
           layout="prev, pager, next"
@@ -24,6 +24,7 @@ export default {
     OrderList,
   },
   props: {
+    // 要展示的OrderList
     orderList: {
       type: Array,
       default: function () {
@@ -31,6 +32,7 @@ export default {
       },
       required: true,
     },
+    // 分页数据
     total: {
       type: Number,
       default: 0,
@@ -48,6 +50,7 @@ export default {
       default: "600px",
     }
   },
+  // 分页请求通过emits传回父组件
   emits: ["change-page"],
   setup(props, {emit}) {
     const changePage = (val) => {

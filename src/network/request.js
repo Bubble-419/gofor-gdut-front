@@ -5,6 +5,7 @@ import {
 import router from '@/router';
 
 export function request(config) {
+	// axios实例，接受config参数
 	const instance = axios.create({
 		// baseURL: 'http://39.108.133.73:8080',
 		baseURL:'http://localhost:8080',
@@ -65,13 +66,3 @@ export function request(config) {
 
 	return instance(config);
 }
-
-// //传送json格式的post请求
-// let base = '';
-// export const postRequest = (url,params)=>{
-//   return axios({
-//     method: 'post',
-//     url: '${base}${url}',
-//     data: params
-//   })
-// }

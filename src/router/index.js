@@ -127,6 +127,7 @@ const router = createRouter({
   routes
 })
 
+// 全局前置守卫，判断路由权限
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !store.state.user.isLogin) {
     next({
@@ -137,6 +138,7 @@ router.beforeEach((to, from, next) => {
   }
 });
 
+// 全局后置守卫，修改页面title
 router.afterEach((to) => {
   if (to.meta.title) {
     document.title = to.meta.title;

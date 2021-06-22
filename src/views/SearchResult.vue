@@ -39,7 +39,6 @@ export default {
       total: 0,
     });
     const getResults = () => {
-      console.log("get results");
       searchByKeywords({
         currentPage: state.currentPage,
         size: state.pageSize,

@@ -106,7 +106,6 @@ export default {
     }
     const onSubmit = () => {
       complainInfo.value.validate((valid) => {
-            console.log("state.complainForm.complainPic:" + state.complainForm.complainPic)
             if (valid) {
               complainInfo.value = {
                 userId: store.state.user.userId,

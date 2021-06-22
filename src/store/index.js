@@ -14,9 +14,9 @@ const state = {
 		userIcon: window.localStorage.getItem('user') ? JSON.parse(window.localStorage.getItem('user')).userIcon : "",
 	},
 	orderCategory: [{
-		name: "帮拿外卖",
-		id: 1
-	},
+			name: "帮拿外卖",
+			id: 1
+		},
 		{
 			name: "帮取快递",
 			id: 2
@@ -39,9 +39,9 @@ const state = {
 		}
 	],
 	orderStatus: [{
-		id: 0,
-		label: "未接单"
-	},
+			id: 0,
+			label: "未接单"
+		},
 		{
 			id: 1,
 			label: "已接单"
@@ -60,9 +60,9 @@ const state = {
 		},
 	],
 	positions: [{
-		label: "大学城校区",
-		value: "大学城校区",
-	},
+			label: "大学城校区",
+			value: "大学城校区",
+		},
 		{
 			label: "龙洞校区",
 			value: "龙洞校区",

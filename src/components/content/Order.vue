@@ -50,6 +50,7 @@ export default {
     },
   },
   setup(props) {
+    // 获取订单发布者信息
     getUserInfoById({userId: props.order.publisherId}).then((res) => {
       state.publisher.publisherName = res.object.name;
       state.publisher.publisherIcon = res.object.userIcon;
@@ -62,6 +63,7 @@ export default {
         publisherIcon: "",
         publisherContact: 0,
       },
+      // 利用getters通过id获得种类和状态的中文名
       orderCategoryName: store.getters.getOrderCategory(
           props.order.orderCategoryId
       ),
